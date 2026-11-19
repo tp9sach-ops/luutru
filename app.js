@@ -31,6 +31,6 @@ async function fixPub(d){
   var n=st.filter(function(s){return(pz[s]||[]).length||unk[s]}).length;
   if(st.length&&!n){var m='Chẩn đoán: '+st.length+' cửa hàng, không cửa hàng nào có quà';try{console.warn(m)}catch(e){}if(DBG){var er=document.getElementById('er');if(er)er.textContent=m}}
   return d}
-function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]})}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function money(n){return Number(n||0).toLocaleString('vi-VN')}
 function snow(){for(var i=0;i<24;i++){var s=document.createElement('i');s.className='sn';s.textContent='❄';s.style.cssText='left:'+Math.random()*100+'vw;animation-duration:'+(6+Math.random()*8)+'s;animation-delay:-'+Math.random()*10+'s;font-size:'+(10+Math.random()*16)+'px';document.body.appendChild(s)}}

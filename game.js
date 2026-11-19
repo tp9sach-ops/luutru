@@ -126,7 +126,7 @@ function fin(r){
   $('rs').hidden=false}
 
 /* ---------- Luồng chơi (giống vòng quay: máy chủ quyết định quà trúng) ---------- */
-function chk(){var ph=$('ph').value.replace(/[^0-9]/g,'');return !P.length?'Cửa hàng này đã hết quà, vui lòng chọn cửa hàng khác':!$('nm').value.trim()?'Vui lòng nhập họ tên':!/^0[0-9]{9}$/.test(ph)?'Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0)':!$('hd').value.trim()?'Vui lòng nhập số hóa đơn':''}
+function chk(){var ph=$('ph').value.replace(/[^0-9]/g,'');return !P.length?(unkNow()?'Đang tải quà của cửa hàng, vui lòng đợi vài giây rồi bấm lại':'Cửa hàng này đã hết quà, vui lòng chọn cửa hàng khác'):!$('nm').value.trim()?'Vui lòng nhập họ tên':!/^0[0-9]{9}$/.test(ph)?'Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0)':!$('hd').value.trim()?'Vui lòng nhập số hóa đơn':''}
 
 function countdown(){
   var tok=++cdTok,el=$('cd');
@@ -163,14 +163,23 @@ function go(){
 function build(){
   if(busy)return;
   P=(D&&D.prizes[ST])||[];LP=P.slice(0,MAXL);buildScene();
-  $('empty').hidden=!!LP.length;$('sp').disabled=!LP.length;
-  $('info').textContent=LP.length?'Có '+LP.length+' cọp – mỗi cọp kéo 1 món quà':''}
+  $('empty').hidden=!!LP.length||unkNow();$('sp').disabled=!LP.length;
+  $('info').textContent=LP.length?'Có '+LP.length+' cọp – mỗi cọp kéo 1 món quà':(unkNow()?'Đang tải quà của cửa hàng…':'')}
+function unkNow(){return !!(D&&D.unk&&D.unk[ST])}
+/* Cửa hàng lúc mở trang chưa tải được quà (lỗi mạng) -> tải lại riêng cửa hàng đó, không báo hết quà */
+function lazy(){
+  if(!unkNow())return;var s=ST;
+  storePrizes(s).then(function(a){
+    delete D.unk[s];D.prizes[s]=a;ls('pub2',JSON.stringify(D));
+    $('st').dataset.k='';apply(D)
+  }).catch(function(){
+    if(ST===s)$('info').textContent='Chưa tải được quà, vui lòng chọn lại cửa hàng hoặc tải lại trang'})}
 
 function apply(d){
   D=d;var c=d.cfg||{},pz=d.prizes=d.prizes||{};
   if(c.Logo){$('logo').src=c.Logo;$('logo').hidden=false}
   $('mn').textContent=money(c.MinTien);
-  var has=function(s){return(pz[s]||[]).length>0};
+  var has=function(s){return(pz[s]||[]).length>0||!!(d.unk&&d.unk[s])};
   var k=d.stores.map(function(x){return x+(has(x)?1:0)}).join('|');
   if($('st').dataset.k!=k){
     $('st').innerHTML=d.stores.map(function(x){return '<option value="'+esc(x)+'"'+(has(x)?'':' disabled')+'>'+esc(x)+(has(x)?'':' (hết quà)')+'</option>'}).join('');
@@ -179,7 +188,7 @@ function apply(d){
   ST=d.stores.indexOf(want)>=0&&has(want)?want:(d.stores.filter(has)[0]||d.stores[0]||'');
   $('st').value=ST;
   var im=d.imgs||{};for(var n in im)IM[n]=im[n];
-  build()}
+  build();lazy()}
 
 function init(){
   R=new TH.WebGLRenderer({canvas:$('cv'),antialias:true});
@@ -195,10 +204,10 @@ function init(){
 try{init()}catch(e){$('er').textContent='Thiết bị không hỗ trợ hiển thị 3D';return}
 snow();
 $('sp').onclick=go;
-$('st').onchange=function(){ST=this.value;ls('st',ST);build()};
+$('st').onchange=function(){ST=this.value;ls('st',ST);build();lazy()};
 $('mute').onclick=function(){mute=!mute;this.textContent=mute?'🔇':'🔊'};
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){if(!busy)buildScene()});
-try{var c0=ls('pub');if(c0)apply(JSON.parse(c0))}catch(e){}
-api('pub').then(function(d){ls('pub',JSON.stringify(d));apply(d)}).catch(function(e){if(!D)$('er').textContent=e.message});
+try{var c0=ls('pub2');if(c0)apply(JSON.parse(c0))}catch(e){}
+api('pub').then(function(d){ls('pub2',JSON.stringify(d));apply(d)}).catch(function(e){if(!D)$('er').textContent=e.message});
 requestAnimationFrame(loop);
 })();
