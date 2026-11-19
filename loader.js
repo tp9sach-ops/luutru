@@ -1,10 +1,15 @@
-/* LOADER v11 – nạp game.js rồi áp bản vá (find-and-replace) trước khi chạy. Vá không khớp bị bỏ qua. ?debug=1 hiển số vá áp được/hụt. ?classic=1 -> bản gốc. */
+/* LOADER v12 – nạp game.js rồi áp bản vá (find-and-replace) trước khi chạy. Vá không khớp bị bỏ qua. ?debug=1 hiển số vá áp được/hụt. ?classic=1 -> bản gốc. */
 (function(){
-var V='game.js?v=12';
+var V='game.js?v=13';
 function run(s){var e=document.createElement('script');e.text=s;document.body.appendChild(e)}
 function plain(){var e=document.createElement('script');e.src=V;document.body.appendChild(e)}
 if(/[?&]classic=1/.test(location.search))return plain();
-var st=document.createElement('style');st.textContent='.box img{border-radius:18px;border:3px solid #ffd05a;box-shadow:0 10px 26px rgba(0,0,0,.35);margin:8px 0}';document.head.appendChild(st);
+var st=document.createElement('style');st.textContent='.box img{border-radius:18px;border:3px solid #ffd05a;box-shadow:0 10px 26px rgba(0,0,0,.35);margin:8px 0}'+
+/* v12: chữ Merry Christmas gọn (hết bị cắt "Merry Chr"), cổng vào có hào quang, đồi tuyết chuyển màu thay vì mảng trắng phẳng */
+'.mc{font-size:clamp(28px,8.5vw,70px)!important;top:45%!important}.mcs{bottom:12%!important}.tvbar{background:linear-gradient(#010a06,#04180f)!important}'+
+'.gt{filter:drop-shadow(0 0 34px rgba(255,205,90,.6)) drop-shadow(0 14px 20px rgba(0,0,0,.5))!important}#gate:after{background:radial-gradient(ellipse at 50% 0,#ffffff,#d6e2ff 55%,#9db1e8)!important;box-shadow:0 -10px 40px #fff9!important}'+
+'select{font-weight:700!important;letter-spacing:.01em}';
+document.head.appendChild(st);
 var P=[
 /* 1. ĐÊM NOËL: trời xanh chàm sâu, sương mù xanh tím, không tone mapping */
 [`var HORIZON=0x9d8fd0;`,`var HORIZON=0x5a56b4;`],
@@ -48,7 +53,17 @@ var P=[
 [`if(t<2.6){p=[cx-10,6+hw*.7,hw*1.5+13];l=[cx+3,.8,0];zt=1.04;k=2.2}`,`if(t<2.6){p=[cx+16,6+hw*.7,hw*1.5+13];l=[cx-2,.8,0];zt=1.04;k=2.2}`],
 [`p=[cx-9,8+hw*.8,hw*1.25+14+Math.sin(tm*.5)*1.2];l=[cx-1,.5,0];k=1.8`,`p=[cx+15,7+hw*.8,hw*1.25+13+Math.sin(tm*.5)*1.2];l=[cx-3,.8,0];k=1.8`],
 [`iP=[cx-3,8+hw*.8,hw*1.25+14],iL=[cx+4,.5,0]`,`iP=[cx+14,7+hw*.8,hw*1.25+13],iL=[cx-3,.8,0]`],
-[`rr=8+hw*.2;p=[FIN-1+Math.cos(ph)*rr*1.2,6.2+Math.sin(u*.8)*.5+hw*.1,zW+Math.sin(ph)*rr];l=[FIN-1,3.2,zW];zt=.9;`,`rr=16+hw*.35;p=[FIN-1+Math.cos(ph)*rr*1.1,8+Math.sin(u*.8)*.6+hw*.15,zW+Math.sin(ph)*rr];l=[FIN-1,3.4,zW];zt=.95;`]
+[`rr=8+hw*.2;p=[FIN-1+Math.cos(ph)*rr*1.2,6.2+Math.sin(u*.8)*.5+hw*.1,zW+Math.sin(ph)*rr];l=[FIN-1,3.2,zW];zt=.9;`,`rr=16+hw*.35;p=[FIN-1+Math.cos(ph)*rr*1.1,8+Math.sin(u*.8)*.6+hw*.15,zW+Math.sin(ph)*rr];l=[FIN-1,3.4,zW];zt=.95;`],
+/* 7. v12 (từ ảnh thật 19/11): cảnh về đích lùi xa + cao hơn (ảnh 1 bị sát cọp, chữ ĐÍCH to lấn khung) */
+[`rr=16+hw*.35;p=[FIN-1+Math.cos(ph)*rr*1.1,8+Math.sin(u*.8)*.6+hw*.15,zW+Math.sin(ph)*rr];l=[FIN-1,3.4,zW];zt=.95;`,`rr=25+hw*.4;p=[FIN-1+Math.cos(ph)*rr*1.1,11+Math.sin(u*.8)*.6+hw*.2,zW+Math.sin(ph)*rr];l=[FIN-1,3.4,zW];zt=1;`],
+/* 8. v12: so le độ cao nhãn quà theo làn (hết chồng "Sữa chua / Panna cotta") */
+[`sp.center.set(.5,0);sp.position.set(0,6.4,0);`,`sp.center.set(.5,0);sp.position.set(0,6.4+(i%3)*1.3,0);`],
+/* 9. v12: dải đen TVC mỏng lại (9% -> 6%), bỏ emoji trên nút để đồng bộ thương hiệu */
+[`BT.style.height=BB.style.height='9%'`,`BT.style.height=BB.style.height='6%'`],
+[`'🐯 ĐUA CỌP'`,`'ĐUA CỌP'`],
+[`'🏁 Đang đua...'`,`'Đang đua...'`],
+[`'🎬 Đang vào cuộc đua...'`,`'Đang vào cuộc đua...'`],
+[`$('sp').onclick=go;`,`$('sp').onclick=go;$('sp').textContent='ĐUA CỌP';`]
 ];
 fetch(V).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(s){
  var ok=0,miss=[];
