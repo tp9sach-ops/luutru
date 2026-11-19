@@ -1,6 +1,6 @@
 # Đua Cọp May Mắn – 9 Sạch
 
-Game thay cho Vòng Quay: khách bấm **ĐUA CỌP**, mỗi món quà là một chú cọp con đeo sừng hưu kéo quà chạy trên đường đua. Cọp kéo quà nào về đích trước thì khách nhận quà đó.
+Game thay cho Vòng Quay: khách bấm **ĐUA CỌP**, mỗi món quà là một chú cọp vàng đội hộp quà trên đầu chạy trên đường đua. Cọp đội quà nào về đích trước thì khách nhận quà đó.
 
 ## Thể lệ (giống Vòng Quay)
 - Dùng chung backend Google Apps Script của repo `vongquay` (cùng link `/exec`, cùng Google Sheet).
@@ -12,7 +12,8 @@ Game thay cho Vòng Quay: khách bấm **ĐUA CỌP**, mỗi món quà là một
 - `index.html` – giao diện
 - `style.css` – kiểu dáng
 - `app.js` – kết nối máy chủ (CFG.API)
-- `game.js` – cảnh 3D (Three.js r128 qua CDN), cọp, đường đua
+- `game.js` – cảnh 3D (Three.js r128 qua CDN), cọp, đường đua, camera, âm thanh
+- `nhac-nen.mp3` – nhạc nền; `alex-morgan-car-car-music-545487.mp3` – nhạc lúc đua
 
 ## Mở game
 Bật GitHub Pages (nhánh main, thư mục gốc), mở https://tp9sach-ops.github.io/luutru/

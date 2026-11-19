@@ -122,25 +122,31 @@ function aurTex(r,g,b){var c=cv2(256,128),x=c.getContext('2d'),i,a,gr;
     x.fillStyle=gr;x.fillRect(i,0,1,128)}
   var t=new TH.CanvasTexture(c);t.wrapS=TH.RepeatWrapping;return t}
 
-/* ================= Cọp con đội hộp quà trên đầu ================= */
+/* ================= Cọp con vàng (chibi) đội hộp quà trên đầu: vàng tươi, bụng/mõm trắng kem, tai tròn viền nâu, má hồng ================= */
 function tiger(col){
-  var OR=0xff7a1a,CR=0xffe6b8,BK=0x241a17,BR=0x5a3320,AN=0xc58a3c;
+  var YL=0xffd21f,WH=0xfffaf0,BR=0x6b3a1a,PK=0xff9bb0,EY=0x4a2410;
   var g=new TH.Group(),b=grp(g,0,.12,0),h=grp(b,0,2.2,0),o={g:g,b:b,h:h,al:[],ll:[]};
-  ball(b,OR,.5,.62,.52,0,.95,0);ball(b,CR,.28,.4,.33,.3,.88,0);
-  [.72,1.02].forEach(function(y){var k=Math.sqrt(1-Math.pow((y-.95)/.62,2)),t=mesh(b,GT,BK,.5*k*1.03,.52*k*1.03,1,0,y,0);t.rotation.x=Math.PI/2});
+  ball(b,YL,.5,.62,.52,0,.95,0);ball(b,WH,.3,.42,.35,.3,.88,0);
+  [.72,1.02].forEach(function(y){var k=Math.sqrt(1-Math.pow((y-.95)/.62,2)),t=mesh(b,GT,BR,.5*k*1.03,.52*k*1.03,1,0,y,0);t.rotation.x=Math.PI/2});
   mesh(b,GT2,col,.43,.43,.9,0,1.4,0).rotation.x=Math.PI/2;ball(b,0xffd54a,.11,.11,.11,.42,1.2,0);
-  ball(h,OR,1.05,.9,.95,0,0,0);ball(h,CR,.42,.34,.5,.78,-.28,0);ball(h,0x6b3a26,.13,.09,.16,1.14,-.12,0);
+  /* đầu tròn to */
+  ball(h,YL,1.1,.98,1.0,0,0,0);
+  ball(h,WH,.46,.36,.52,.8,-.3,0);                         /* mõm trắng */
+  ball(h,0x5a2d1a,.13,.09,.16,1.17,-.12,0);                /* mũi nâu */
+  ball(h,0x7a2236,.1,.07,.19,1.12,-.4,0);ball(h,PK,.07,.04,.11,1.19,-.45,0); /* miệng cười + lưỡi hồng */
   [-1,1].forEach(function(s){
-    ball(h,0x111111,.13,.17,.13,.95,.08,s*.36);ball(h,0xffffff,.04,.05,.04,1.06,.15,s*.34);
-    ball(h,0xff8aa0,.1,.07,.05,.8,-.14,s*.6);
-    ball(h,BR,.06,.04,.05,.86,.48,s*.22);
-    ball(h,BR,.12,.3,.3,-.05,.74,s*.76);ball(h,CR,.08,.2,.2,.07,.74,s*.74);
-    [.2,0,-.2].forEach(function(y){var x=-.25,z=.95*Math.sqrt(Math.max(0,1-Math.pow(y/.9,2)-Math.pow(x/1.05,2)));ball(h,BK,.38,.05,.12,x,y,s*(z-.01))});
-    [0,1].forEach(function(j){mesh(h,GB,BK,.5,.012,.012,1.1,-.22+j*.07,s*.38).rotation.y=-s*.5});
-    var ar=grp(b,.1,1.28,s*.52);ball(ar,OR,.17,.32,.17,0,-.26,0);ball(ar,CR,.13,.13,.13,0,-.52,0);ar.rotation.x=-s*2.2;o.al.push(ar);
-    var lg=grp(b,0,.42,s*.25);ball(lg,OR,.2,.32,.2,0,-.12,0);ball(lg,CR,.28,.1,.2,.09,-.4,0);o.ll.push(lg)});
-  [-.4,-.1,.2].forEach(function(x){ball(h,BK,.07,.03,.2,x,.9*Math.sqrt(1-Math.pow(x/1.05,2))-.005,0)});
-  o.t=grp(b,-.42,.62,0);for(var i=0;i<5;i++)ball(o.t,i%2?BK:(i==4?0xffffff:OR),.1,.1,.1,-.1*i,.03*i*i,0);
+    ball(h,EY,.14,.21,.15,.97,.1,s*.37);ball(h,0x111111,.08,.13,.09,1.05,.1,s*.37);
+    ball(h,0xffffff,.06,.08,.06,1.08,.18,s*.34);ball(h,0xffffff,.03,.03,.03,1.09,.02,s*.41);   /* mắt to có điểm sáng */
+    ball(h,PK,.06,.1,.14,.9,-.2,s*.62);                    /* má hồng */
+    ball(h,BR,.06,.04,.05,.9,.5,s*.22);                    /* lông mày */
+    ball(h,BR,.14,.42,.42,-.05,.8,s*.78);ball(h,YL,.15,.35,.35,0,.8,s*.78);ball(h,PK,.16,.23,.23,.05,.8,s*.78); /* tai tròn: viền nâu, vàng, hồng */
+    [.25,.04,-.17].forEach(function(y){var x=-.2,z=Math.sqrt(Math.max(0,1-Math.pow(y/.98,2)-Math.pow(x/1.1,2)));ball(h,BR,.36,.05,.12,x,y,s*(z-.01))});  /* sọc má */
+    [0,1].forEach(function(j){mesh(h,GB,BR,.5,.012,.012,1.18,-.3+j*.07,s*.4).rotation.y=-s*.5});
+    var ar=grp(b,.1,1.28,s*.52);ball(ar,YL,.17,.32,.17,0,-.26,0);ball(ar,WH,.15,.15,.15,0,-.52,0);ball(ar,PK,.09,.09,.06,.1,-.54,0);ar.rotation.x=-s*2.2;o.al.push(ar);
+    var lg=grp(b,0,.42,s*.25);ball(lg,YL,.2,.32,.2,0,-.12,0);ball(lg,WH,.28,.1,.2,.09,-.4,0);o.ll.push(lg)});
+  /* sọc trán */
+  [-.45,-.15,.15].forEach(function(x){ball(h,BR,.07,.03,.2,x,.98*Math.sqrt(1-Math.pow(x/1.1,2))-.005,0)});
+  o.t=grp(b,-.42,.62,0);for(var i=0;i<5;i++)ball(o.t,i%2?BR:(i==4?WH:YL),.1,.1,.1,-.1*i,.03*i*i,0);
   return o}
 
 /* ================= Làn đua: mỗi cọp đội 1 hộp quà trên đầu ================= */
@@ -153,8 +159,9 @@ function lane(i,n,p){
   mesh(gb,GB,RB,1.04,.94,.16,0,.45,0);mesh(gb,GB,RB,.16,.94,.88,0,.45,0);
   mesh(gb,GB,RB,1.16,.24,.16,0,.98,0);mesh(gb,GB,RB,.16,.24,1.0,0,.98,0);
   ball(gb,RB,.3,.2,.16,0,1.22,.2);ball(gb,RB,.3,.2,.16,0,1.22,-.2);ball(gb,RB,.14,.14,.14,0,1.2,0);
+  gb.scale.setScalar(1.22);
   var gl=new TH.Sprite(new TH.SpriteMaterial({map:TX.glowY,transparent:true,opacity:.5,depthWrite:false,blending:TH.AdditiveBlending}));gl.scale.set(3.4,3.4,1);gl.position.set(0,.7,0);gb.add(gl);
-  var sp=label(p.ten,col,3.0,1.25);sp.position.set(0,6.1,0);ln.add(sp);
+  var sp=label(p.ten,col,2.6,1.08);sp.position.set(0,6.2,0);ln.add(sp);
   return {ln:ln,tg:tg,gb:gb,gl:gl,ph:Math.random()*6}}
 
 /* ================= Cây thông, nhà gỗ, quà, người tuyết (đều gộp batch) ================= */
@@ -212,23 +219,52 @@ function bcabin(x,z,s){
   bpop()}
 function bsnowmound(x,z){bs(0xffffff,1.5,.6,1.1,x,.25,z)}
 
+/* ================= Đường đua: texture vẽ sẵn (làn xanh thông / đỏ cherry bóng, mũi tên chạy, vạch vàng, kim tuyến) ================= */
+function trackMesh(n,x0,len,cx,W){
+  var Wc=2048,Hc=1024,c=cv2(Wc,Hc),x=c.getContext('2d'),lh=Hc/n,px=Wc/len,py=Hc/(n*LS),i,j,g,y0,a,u;
+  for(i=0;i<n;i++){
+    y0=i*lh;a=i%2?['#238a5e','#14583f']:['#d1364a','#9c1d2f'];
+    g=x.createLinearGradient(0,y0,0,y0+lh);g.addColorStop(0,a[1]);g.addColorStop(.5,a[0]);g.addColorStop(1,a[1]);x.fillStyle=g;x.fillRect(0,y0,Wc,lh);
+    /* mũi tên chạy (chỉ hướng đua) giữa vạch xuất phát và đích */
+    x.fillStyle='rgba(255,246,224,.2)';
+    for(u=7;u<FIN-1;u+=6){
+      var cx0=(u-x0)*px,cy=y0+lh/2,hw=.8*px,hh=LS*.3*py;
+      x.beginPath();x.moveTo(cx0-hw,cy-hh);x.lineTo(cx0,cy-hh);x.lineTo(cx0+hw,cy);x.lineTo(cx0,cy+hh);x.lineTo(cx0-hw,cy+hh);x.lineTo(cx0,cy);x.closePath();x.fill()}}
+  /* kim tuyến lấp lánh */
+  for(i=0;i<1400;i++){x.fillStyle='rgba(255,255,255,'+(.12+Math.random()*.3)+')';x.fillRect(Math.random()*Wc,Math.random()*Hc,1+Math.random()*2,1+Math.random()*2)}
+  /* vạch ngăn làn trắng ngà, mép ngoài vàng */
+  x.fillStyle='#fff6e0';for(j=1;j<n;j++)x.fillRect(0,j*lh-Math.max(2,py*.06),Wc,Math.max(4,py*.12));
+  x.fillStyle='#ffd54a';x.fillRect(0,0,Wc,Math.max(5,py*.14));x.fillRect(0,Hc-Math.max(5,py*.14),Wc,Math.max(5,py*.14));
+  /* vạch xuất phát */
+  x.fillStyle='#ffffff';x.fillRect((3.1-x0)*px,0,px*.55,Hc);
+  var t=new TH.CanvasTexture(c);try{t.anisotropy=Math.min(8,R.capabilities.getMaxAnisotropy())}catch(e){}
+  var m=new TH.Mesh(GP,new TH.MeshStandardMaterial({map:t,roughness:.55,metalness:0}));
+  m.rotation.x=-Math.PI/2;m.scale.set(len,W,1);m.position.set(cx,.05,0);m.userData.trk=1;world.add(m)}
+function blamp(x,z,s){
+  bpush(x,0,z,s,0);
+  bc(0x2b2538,.12,3.4,.12,0,1.7,0);bc(0x2b2538,.28,.2,.28,0,.1,0);
+  bp(GL,0xffe08a,.34,.42,.34,0,3.6,0,0,0,0,1);bb(0x2b2538,.5,.1,.5,0,3.95,0);
+  glowS(TX.glowO,4.2,4.2,0,3.6,0,.65);
+  bpop()}
+
 /* ================= Dựng cảnh theo số cọp ================= */
 var CB=[[-4,1.3],[28,1.8],[64,1.5],[104,1.8]];
 function clearX(x){return CB.every(function(c){return Math.abs(x-c[0])>c[1]*4.5+3})}
 function buildScene(){
   while(world.children.length){var c=world.children[0];world.remove(c);c.traverse(function(o){
     if(o.userData&&o.userData.own&&o.geometry)o.geometry.dispose();
+    if(o.userData&&o.userData.trk){if(o.material.map)o.material.map.dispose();o.material.dispose()}
     if(o.isSprite&&o.material&&o.material.map&&o.material.map!==TX.glowY&&o.material.map!==TX.glowO&&o.material.map!==TX.smoke)o.material.map.dispose()})}
   LN=[];SMK=[];BD=[];BI=null;PC=[[],[]];MS=[new TH.Matrix4()];
   var n=LP.length;if(!n)return;
   var W=n*LS,x0=-12,x1=FIN+36,len=x1-x0,cx=(x0+x1)/2,zf=-W/2,zn=W/2,i,j,k,s;
   LT1.position.set(28,6,zf-8);LT2.position.set(FIN+4,6,0);
   /* nền tuyết + đồi tuyết nhỏ */
-  bb(0xeef2ff,700,.2,700,40,-.1,0);
+  bb(0xe4ecff,700,.2,700,40,-.1,0);
   for(i=0;i<46;i++){var side=i%2?1:-1,mz=side*(W/2+7+Math.random()*14),mx=-20+Math.random()*170,r=1.5+Math.random()*3;bm(0xf8faff,r*1.8,r*.35,r*1.2,mx,0,mz)}
   /* đường đua: làn đỏ/xanh xen kẽ + vạch trắng + gờ tuyết */
-  for(i=0;i<n;i++)bb(i%2?0x1b7f4f:0xc2313a,len,.06,LS,cx,.03,(i-(n-1)/2)*LS);
-  for(j=0;j<=n;j++)bb(0xffffff,len,.07,.12,cx,.07,(j-n/2)*LS);
+  trackMesh(n,x0,len,cx,W);
+  [-1,1].forEach(function(q){bb(0xffd54a,len,.1,.2,cx,.07,q*W/2)});
   for(i=0;i<n*2;i++)for(j=0;j<2;j++)bb((i+j)%2?0x222222:0xffffff,.6,.09,LS/2,FIN+.9+j*.6,.09,-W/2+LS/4+i*LS/2);
   [-1,1].forEach(function(q){bp(GS,0xf9fbff,len/2,.5,.9,cx,.1,q*(W/2+1.05),0,0,0,0)});
   /* cọc kẹo + dây đèn dọc 2 mép */
@@ -252,6 +288,7 @@ function buildScene(){
   for(k=0;k<12;k++){var tx=-9+k*9.4;btree(tx,zf-3.8-(k%3)*.6,.85+(k%3)*.08,true,false);if(k%2==1&&tx>10&&tx<80)btree(tx+3,zf-9,.7,false,false)}
   for(k=0;k<11;k++){var bx=-6+k*11.5;if(clearX(bx))btree(bx,zf-8-(k%2)*2.5,1.25+(k%3)*.15,k%2==0,false)}
   btree(14,zf-7.5,2.3,true,true);btree(FIN+16,zf-7,2.1,true,true);
+  for(k=0;k<8;k++)blamp(-2+k*14.5,zf-2.9,1);
   /* nhà gỗ */
   CB.forEach(function(c,ci){bcabin(c[0],zf-14-(ci%2)*2.5-c[1]*1.5,c[1])});
   /* quà, người tuyết, biển, xe trượt */
@@ -323,23 +360,27 @@ function loop(now){
 /* ================= Camera điện ảnh + TVC mở đầu 4 giây ================= */
 function ease(u){u=Math.max(0,Math.min(1,u));return u*u*(3-2*u)}
 function mix(a,b,u){return[a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u,a[2]+(b[2]-a[2])*u]}
+/* Đường đi của camera (hàm thuần, dễ kiểm tra): trả [vị trí, điểm nhìn, zoom, độ mượt, rung] */
+function camShot(st,t,n,hw,cx,zW,zc){
+  var p,l,zt=1,k=6,sh=0,u,ph,rr,iP=[cx-3,8+hw*.8,hw*1.25+14],iL=[cx+4,.5,0];
+  if(st=='intro'){
+    k=1000;
+    if(t<1.5){u=ease(t/1.5);p=mix([-26,21,hw+44],[22,9+hw*.3,hw+22],u);l=mix([22,1,-3],[34,1.2,0],u);zt=1.12-.12*u}            /* toàn cảnh: bay dọc đường đua, nhà gỗ, cây thông */
+    else if(t<2.6){u=ease((t-1.5)/1.1);p=mix([22,9+hw*.3,hw+22],[3.6,3.9,zc+7.4],u);l=mix([34,1.2,0],[0,3.1,zc],u);zt=1-.12*u}   /* lao vào cọp giữa (thấy rõ hộp quà trên đầu) */
+    else{u=ease((t-2.6)/1.4);p=mix([3.6,3.9,zc+7.4],iP,u);l=mix([0,3.1,zc],iL,u);zt=.88+.12*u}                                    /* lùi lại + chữ Merry Christmas */
+  }else if(st=='race'||st=='done'){
+    if(t<2.6){p=[cx-10,6+hw*.7,hw*1.5+13];l=[cx+3,.8,0];zt=1.04;k=2.2}                                                    /* xuất phát: chếch cao, thấy cả hàng cọp */
+    else if(t<DUR-2.4){p=[cx-9,8+hw*.8,hw*1.25+14+Math.sin(tm*.5)*1.2];l=[cx-1,.5,0];k=1.8}                               /* chạy: nhìn từ trên chếch nhẹ, rõ vị trí từng quà */
+    else if(t<DUR+.8){u=Math.min(1,(t-(DUR-2.4))/3.2);l=[56+u*10,.3,0];p=[l[0]-8,11+hw*.85,hw*1.15+14];zt=1-.05*ease(u);k=2.4;sh=.008+.03*u}   /* về đích: góc cao chếch, nhìn rõ ai dẫn đầu */
+    else{u=t-DUR-.8;ph=Math.PI*(.3+.08*u);rr=8+hw*.2;p=[FIN-1+Math.cos(ph)*rr*1.2,6.2+Math.sin(u*.8)*.5+hw*.1,zW+Math.sin(ph)*rr];l=[FIN-1,3.2,zW];zt=.9;k=2.4}  /* người thắng: xoay quanh từ trên cao nhìn cọp + hộp quà */
+  }else{p=[iP[0],iP[1]+Math.sin(tm*.7)*.12,iP[2]];l=iL;k=4}
+  return [p,l,zt,k,sh]}
 function cam(now,dt){
   var n=Math.max(1,LP.length),hw=n*LS/2,asp=fw&&fh?fw/fh:1.6,K=asp<1?1+(1-asp)*.7:1,
-   p,l,zt=1,k=6,t,u,zc,rt,sh=0,zW,ph,rr;
-  var iP=[CAMX-5,4.6+hw*.55,hw*1.35+11],iL=[CAMX+7,1,0];
+   zc=((LP.length>>1)-(n-1)/2)*LS,zW=plan?(plan.W-(n-1)/2)*LS:0,
+   t=state=='intro'?(now-introT0)/1000:(plan?(now-plan.t0)/1000:0),
+   r=camShot(state,t,n,hw,CAMX,zW,zc),p=r[0],l=r[1],zt=r[2],k=r[3],sh=r[4];
   baseFov=asp<1?58:40;
-  if(state=='intro'){
-    t=(now-introT0)/1000;zc=((LP.length>>1)-(n-1)/2)*LS;k=1000;
-    if(t<1.6){u=ease(t/1.6);p=mix([-18,17,hw+38],[36,8.5,hw+25],u);l=mix([26,1,-2],[50,1.5,0],u);zt=1.18-.18*u}
-    else if(t<2.6){u=ease((t-1.6)/1);p=mix([4.6,2.4,zc+11],[2.8,2.6,zc+6.6],u);l=[0,2.6,zc];zt=1-.1*u}
-    else{u=ease((t-2.6)/1.4);p=mix([2.8,2.6,zc+6.6],iP,u);l=mix([0,2.6,zc],iL,u);zt=.9+.1*u}
-  }else if((state=='race'||state=='done')&&plan){
-    rt=(now-plan.t0)/1000;zW=(plan.W-(n-1)/2)*LS;
-    if(rt<3.4){p=[CAMX-9,2.7+hw*.3,hw+8+hw*.5];l=[CAMX+6,1.2,-hw*.12];zt=1.04;k=2.2}
-    else if(rt<DUR-3.4){p=[CAMX-3,4.8+hw*.55,hw*1.3+11+Math.sin(tm*.5)*1.5];l=[CAMX+7,1,0];k=1.8}
-    else if(rt<DUR+.8){u=(rt-(DUR-3.4))/4.2;p=[FIN+5+hw*1.05,2.2+hw*.3,hw*.5];l=[FIN-8,1.4,-hw*.08];zt=1-.2*ease(u);k=2.6;sh=.015+.06*u}
-    else{u=rt-DUR-.8;ph=Math.PI*(.28+.1*u);rr=7+hw*.25;p=[FIN-1+Math.cos(ph)*rr*1.3,3.2+Math.sin(u*.8)*.4+hw*.08,zW+Math.sin(ph)*rr];l=[FIN-1,2.6,zW];zt=.9;k=2.4}
-  }else{p=[iP[0],iP[1]+Math.sin(tm*.7)*.12,iP[2]];l=iL;k=4}
   p=[l[0]+(p[0]-l[0])*K,l[1]+(p[1]-l[1])*K,l[2]+(p[2]-l[2])*K];
   if(!camSet){CP.set(p[0],p[1],p[2]);CL.set(l[0],l[1],l[2]);zoom=zt;camSet=1}
   var f=1-Math.exp(-dt*k);
@@ -492,7 +533,7 @@ function init(){
   var sh=new TH.Shape();sh.moveTo(-3,0);sh.lineTo(3,0);sh.lineTo(0,3.6*Math.tan(.62));sh.closePath();GTri=new TH.ShapeGeometry(sh);
   MST=[new TH.MeshStandardMaterial({vertexColors:true,roughness:.85,metalness:0}),new TH.MeshBasicMaterial({vertexColors:true})];
   TX={glowY:glowTex('255,214,90'),glowO:glowTex('255,160,70'),glowW:glowTex('255,244,210'),smoke:smokeTex(),sky:skyTex(),aurG:aurTex(90,255,170),aurM:aurTex(200,110,255)};
-  S.add(new TH.HemisphereLight(0xcfc6ff,0xdfe6ff,1.05));
+  S.add(new TH.HemisphereLight(0xfff0e6,0xbccaff,1.02));
   var l=new TH.DirectionalLight(0xbfcdff,.75);l.position.set(-14,26,22);S.add(l);
   LT1=new TH.PointLight(0xff9a40,1.3,46,2);S.add(LT1);LT2=new TH.PointLight(0xffb060,1.1,40,2);S.add(LT2);
   world=new TH.Group();S.add(world);
