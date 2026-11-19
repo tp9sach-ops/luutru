@@ -1,0 +1,22 @@
+<!DOCTYPE html><html lang='vi'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,viewport-fit=cover'><title>Đua Cọp May Mắn – 9 Sạch</title><link rel='preconnect' href='https://fonts.googleapis.com'><link href='https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap' rel='stylesheet'><link rel='stylesheet' href='style.css'></head><body>
+<button id='mute' class='mute'>🔊</button>
+<main class='wrap'>
+<img id='logo' class='logo' alt='9 Sạch' hidden>
+<h1 class='ttl'>ĐUA CỌP MAY MẮN</h1>
+<div class='sub'>Cọp nào kéo quà về đích trước, quà đó là của bạn</div>
+<p class='sub2'>Hóa đơn từ <b id='mn'>199.000</b>đ được đua 1 lần</p>
+<div class='stage'><canvas id='cv'></canvas><div id='cd' class='cd' hidden></div><div id='info' class='info'></div></div>
+<div class='card'>
+<label>Cửa hàng</label><select id='st'></select>
+<label>Họ tên</label><input id='nm' autocomplete='name'>
+<label>Số điện thoại</label><input id='ph' type='tel' inputmode='numeric' maxlength='11'>
+<label>Số hóa đơn</label><input id='hd'>
+<button id='sp' class='btn'>🐯 ĐUA CỌP</button>
+<p id='er' class='err'></p>
+</div>
+</main>
+<div id='rs' class='modal' hidden><div class='box'><div class='big'>🎉</div><h2>Chúc mừng <span id='rn'></span>!</h2><img id='ri' hidden alt=''><p>Cọp của bạn đã kéo về đích</p><h1 id='rp'></h1><p>Vui lòng đưa màn hình này cho nhân viên để nhận quà. 🎅</p><button class='btn' onclick='location.reload()'>Đóng</button></div></div>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'></script>
+<script src='app.js'></script>
+<script src='game.js'></script>
+</body></html>
