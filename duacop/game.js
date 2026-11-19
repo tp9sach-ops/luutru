@@ -126,7 +126,7 @@ function fin(r){
   $('rs').hidden=false}
 
 /* ---------- Luồng chơi (giống vòng quay: máy chủ quyết định quà trúng) ---------- */
-function chk(){var ph=$('ph').value.replace(/[^0-9]/g,'');return !$('nm').value.trim()?'Vui lòng nhập họ tên':!/^0[0-9]{9}$/.test(ph)?'Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0)':!$('hd').value.trim()?'Vui lòng nhập số hóa đơn':!P.length?'Cửa hàng này đã hết quà':''}
+function chk(){var ph=$('ph').value.replace(/[^0-9]/g,'');return !P.length?'Cửa hàng này đã hết quà, vui lòng chọn cửa hàng khác':!$('nm').value.trim()?'Vui lòng nhập họ tên':!/^0[0-9]{9}$/.test(ph)?'Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0)':!$('hd').value.trim()?'Vui lòng nhập số hóa đơn':''}
 
 function countdown(){
   var tok=++cdTok,el=$('cd');
@@ -135,7 +135,9 @@ function countdown(){
     if(k>0){el.hidden=false;el.textContent=k;beep(440,.2);k--;setTimeout(step,800)}
     else{el.textContent='ĐUA!';beep(880,.4);setTimeout(function(){el.hidden=true;res()},500)}})()})}
 
-function reset(msg){cdTok++;state='idle';busy=0;$('cd').hidden=true;$('sp').disabled=false;$('sp').textContent='🐯 ĐUA CỌP';$('er').textContent=msg||''}
+function reset(msg){
+  cdTok++;state='idle';busy=0;document.body.classList.remove('racing');
+  $('cd').hidden=true;$('sp').disabled=!LP.length;$('sp').textContent='🐯 ĐUA CỌP';$('er').textContent=msg||''}
 
 function startRace(r){
   var wi=-1,i;LP.forEach(function(p,k){if(p.id==r.id)wi=k});
@@ -150,6 +152,7 @@ function startRace(r){
 function go(){
   if(busy)return;var e=chk();$('er').textContent=e;if(e)return;
   busy=1;$('sp').disabled=true;$('sp').textContent='⏳ Chuẩn bị xuất phát...';state='warm';plan=null;
+  document.body.classList.add('racing');window.scrollTo(0,0);
   var cd=countdown();
   api('spin',{store:ST,ten:$('nm').value,sdt:$('ph').value,hd:$('hd').value})
     .then(function(r){return cd.then(function(){return r})})
@@ -160,15 +163,20 @@ function go(){
 function build(){
   if(busy)return;
   P=(D&&D.prizes[ST])||[];LP=P.slice(0,MAXL);buildScene();
-  $('info').textContent=LP.length?'Có '+LP.length+' cọp – mỗi cọp kéo 1 món quà':'Cửa hàng này đã hết quà'}
+  $('empty').hidden=!!LP.length;$('sp').disabled=!LP.length;
+  $('info').textContent=LP.length?'Có '+LP.length+' cọp – mỗi cọp kéo 1 món quà':''}
 
 function apply(d){
-  D=d;var c=d.cfg||{};
+  D=d;var c=d.cfg||{},pz=d.prizes=d.prizes||{};
   if(c.Logo){$('logo').src=c.Logo;$('logo').hidden=false}
   $('mn').textContent=money(c.MinTien);
-  var k=d.stores.join('|');
-  if($('st').dataset.k!=k){$('st').innerHTML=d.stores.map(function(x){return '<option>'+esc(x)+'</option>'}).join('');$('st').dataset.k=k}
-  if(d.stores.indexOf(ST)<0)ST=d.stores.indexOf(ls('st'))>=0?ls('st'):(d.stores[0]||'');
+  var has=function(s){return(pz[s]||[]).length>0};
+  var k=d.stores.map(function(x){return x+(has(x)?1:0)}).join('|');
+  if($('st').dataset.k!=k){
+    $('st').innerHTML=d.stores.map(function(x){return '<option value="'+esc(x)+'"'+(has(x)?'':' disabled')+'>'+esc(x)+(has(x)?'':' (hết quà)')+'</option>'}).join('');
+    $('st').dataset.k=k}
+  var want=ST||ls('st');
+  ST=d.stores.indexOf(want)>=0&&has(want)?want:(d.stores.filter(has)[0]||d.stores[0]||'');
   $('st').value=ST;
   var im=d.imgs||{};for(var n in im)IM[n]=im[n];
   build()}
