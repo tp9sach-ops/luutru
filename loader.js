@@ -1,6 +1,6 @@
 /* LOADER v11 – nạp game.js rồi áp bản vá (find-and-replace) trước khi chạy. Vá không khớp bị bỏ qua. ?debug=1 hiển số vá áp được/hụt. ?classic=1 -> bản gốc. */
 (function(){
-var V='game.js?v=8';
+var V='game.js?v=12';
 function run(s){var e=document.createElement('script');e.text=s;document.body.appendChild(e)}
 function plain(){var e=document.createElement('script');e.src=V;document.body.appendChild(e)}
 if(/[?&]classic=1/.test(location.search))return plain();
