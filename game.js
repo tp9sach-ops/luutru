@@ -17,7 +17,12 @@ function beep(f,d){if(mute)return;try{var A=window.AC=window.AC||new (window.Aud
 
 /* ================= ÂM THANH: nhạc nền + nhạc đua (file mp3 để cùng thư mục với index.html) ================= */
 var AU={bgm:null,race:null,unl:0,mode:'idle'};
-function mkAu(src,vol,fb){var a=new Audio();a.preload='auto';a.loop=true;a._v=vol;a._t=0;a._c=0;a._bad=0;a._fb=fb||'';a.addEventListener('error',function(){if(a._fb){var u=a._fb;a._fb='';a.src=u;try{a.load()}catch(e){}if(a._t>0)auSet(a,a._t,0)}else a._bad=1});a.src=src;try{a.volume=0}catch(e){}return a}
+function mkAu(src,vol,fb){var a=new Audio();a.preload='auto';a.loop=true;a._v=vol;a._t=0;a._c=0;a._bad=0;a._fb=fb||'';a._rt=0;a._src=src;a._r=0;
+  a.addEventListener('error',function(){
+    if(a._fb){var u=a._fb;a._fb='';a.src=u;try{a.load()}catch(e){}return}
+    /* lỗi tải (vd. trình duyệt còn nhớ lỗi 404 cũ): thử lại tối đa 4 lần với tham số mới để tránh cache */
+    if(a._rt<4){a._rt++;setTimeout(function(){a.src=a._src+(a._src.indexOf('?')<0?'?':'&')+'r='+Date.now();try{a.load()}catch(e){}},1200*a._rt)}else a._bad=1});
+  a.src=src;try{a.volume=0}catch(e){}return a}
 function auSet(a,t,rs){
   if(!a)return;a._t=t;
   if(t>0&&!mute&&AU.unl&&!a._bad&&a.paused){
@@ -26,6 +31,8 @@ function auSet(a,t,rs){
 function auMode(m){AU.mode=m;auSet(AU.bgm,m=='race'?0:1,0);auSet(AU.race,m=='race'?1:0,1)}
 function auTick(dt){[AU.bgm,AU.race].forEach(function(a){
   if(!a)return;var tg=mute?0:a._t*a._v,st=dt*1.1;
+  /* tự phát lại nếu cần phát mà đang dừng (play bị từ chối / file tải chậm) */
+  if(a._t>0&&!mute&&AU.unl&&!a._bad&&a.paused&&((a._r-=dt)<=0)){a._r=.5;auSet(a,a._t,0)}
   a._c+=Math.max(-st,Math.min(st,tg-a._c));
   try{a.volume=Math.max(0,Math.min(1,a._c))}catch(e){}
   if(a._c<.004&&tg===0&&!a.paused)a.pause()})}
@@ -35,7 +42,7 @@ function unlock(){
     if(p&&p.then)p.then(function(){r.pause();try{r.currentTime=0}catch(e){}r.muted=false}).catch(function(){r.muted=false});else r.muted=false}
   auMode(AU.mode)}
 function auInit(){
-  AU.bgm=mkAu('nhac-nen.mp3',.5,'https://tp9sach-ops.github.io/vongquay/nhac-nen.mp3');AU.race=mkAu('alex-morgan-car-car-music-545487.mp3',.8);
+  AU.bgm=mkAu('nhac-nen.mp3?v=6',.5,'https://tp9sach-ops.github.io/vongquay/nhac-nen.mp3');AU.race=mkAu('alex-morgan-car-car-music-545487.mp3?v=6',.8);
   ['pointerdown','touchend','click','keydown'].forEach(function(ev){document.addEventListener(ev,unlock,{passive:true})});
   document.addEventListener('visibilitychange',function(){
     if(document.hidden){[AU.bgm,AU.race].forEach(function(a){if(a&&!a.paused)a.pause()})}else if(AU.unl)auMode(AU.mode)});

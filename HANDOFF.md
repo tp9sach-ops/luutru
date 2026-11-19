@@ -7,7 +7,7 @@
 - Luôn điều tra bằng bằng chứng trước khi sửa; không bịa kết quả test; nói rõ cái gì đã kiểm chứng, cái gì chưa.
 
 ## BỐI CẢNH
-- Repo: https://github.com/tp9sach-ops/luutru (main, GitHub Pages https://tp9sach-ops.github.io/luutru/). Tệp: index.html, style.css, app.js, game.js (Three.js r128 CDN). index.html gọi `game.js?v=6`, `app.js?v=4`, `style.css?v=4` để phá cache.
+- Repo: https://github.com/tp9sach-ops/luutru (main, GitHub Pages https://tp9sach-ops.github.io/luutru/). Tệp: index.html, style.css, app.js, game.js (Three.js r128 CDN). index.html gọi `game.js?v=7`, `app.js?v=4`, `style.css?v=4` để phá cache.
 - Game thay Vòng Quay: bấm ĐUA CỌP, mỗi quà = 1 cọp; cọp đội quà nào về đích thì khách nhận quà đó (tối đa 12 cọp). Máy chủ quyết định quà trúng (spin), game chỉ dàn cảnh.
 - Backend dùng chung repo vongquay: Apps Script /exec (CFG.API trong app.js), Sheet ID 1t3FMhGuPOhnNK3ywyauBG4c6BVsKr9cDPlbuWfVUwh4. app.js tương thích cả Apps Script cũ/mới.
 
