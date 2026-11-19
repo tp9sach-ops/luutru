@@ -1,25 +1,39 @@
-*{box-sizing:border-box}html,body{margin:0}
-body{font-family:'Baloo 2',system-ui,sans-serif;background:linear-gradient(#0e6b43,#073b27) fixed;color:#fff;min-height:100vh;overflow-x:hidden}
-.wrap{max-width:720px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) 14px 40px;text-align:center}
-.logo{height:56px;border-radius:12px;margin:4px auto;display:block}.logo[hidden]{display:none}
-.ttl{margin:4px 0 0;font-size:clamp(28px,7vw,44px);font-weight:800;color:#ffb347;text-shadow:0 3px 0 #7a3004}
-.sub{font-weight:700;font-size:16px}.sub2{margin:4px 0 12px;opacity:.9}
-.stage{position:relative;border-radius:20px;overflow:hidden;border:4px solid #ff8a1f;box-shadow:0 10px 30px #0006;background:#cdeeff}
-#cv{display:block;width:100%;aspect-ratio:16/10;touch-action:none}
-@media(max-width:600px){#cv{aspect-ratio:4/5}}
-.cd{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:110px;font-weight:800;color:#fff;text-shadow:0 6px 0 #d9550a,0 0 30px #0008;pointer-events:none}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font-family:'Baloo 2',system-ui,sans-serif;background:linear-gradient(#0e6b43,#073b27) fixed;color:#fff;min-height:100vh;min-height:100dvh;overflow-x:hidden}
+.app{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;gap:8px;max-width:760px;margin:0 auto;padding:max(8px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom))}
+.top{display:flex;align-items:center;gap:10px}
+.logo{height:44px;width:44px;object-fit:cover;border-radius:12px;flex:none}.logo[hidden]{display:none}
+.hd{flex:1;min-width:0;text-align:left}
+.ttl{margin:0;font-size:clamp(20px,6vw,32px);line-height:1.1;font-weight:800;color:#ffb347;text-shadow:0 2px 0 #7a3004}
+.sub{margin:2px 0 0;font-size:13px;font-weight:600;opacity:.92;line-height:1.25}
+.mute{flex:none;border:0;background:#0005;color:#fff;border-radius:50%;width:40px;height:40px;font-size:18px}
+.rule{align-self:center;background:#0004;border-radius:999px;padding:3px 14px;font-size:14px;font-weight:600}
+.rule b{color:#ffd27a}
+.stage{position:relative;flex:1;min-height:250px;border-radius:18px;overflow:hidden;border:3px solid #ff8a1f;box-shadow:0 8px 24px #0006;background:#cdeeff}
+@media(min-width:700px){.stage{min-height:380px;max-height:560px}}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.cd{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:96px;font-weight:800;color:#fff;text-shadow:0 5px 0 #d9550a,0 0 28px #0008;pointer-events:none}
 .cd[hidden]{display:none}
-.info{position:absolute;left:0;right:0;bottom:8px;font-weight:700;color:#7a3004;text-shadow:0 1px 0 #fff;pointer-events:none}
-.card{background:#fff8ea;color:#5a2b0b;border-radius:20px;padding:16px;margin-top:14px;text-align:left;box-shadow:0 8px 24px #0005}
-label{display:block;font-weight:700;margin:8px 0 2px}
-input,select{width:100%;padding:12px;border-radius:12px;border:2px solid #f0c48a;font:inherit;font-size:16px;background:#fff;color:#333}
-.btn{width:100%;margin-top:14px;padding:14px;border:0;border-radius:999px;font:inherit;font-size:20px;font-weight:800;color:#fff;background:linear-gradient(#ff9a2e,#e8590c);box-shadow:0 5px 0 #a33d06;cursor:pointer}
-.btn:disabled{opacity:.6;cursor:default}
-.err{color:#c62828;font-weight:700;min-height:20px;margin:8px 0 0}
-.mute{position:fixed;top:10px;right:10px;z-index:5;border:0;background:#0006;color:#fff;border-radius:50%;width:42px;height:42px;font-size:20px}
+.info{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);max-width:92%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#fffd;color:#7a3004;font-size:13px;font-weight:700;padding:3px 12px;border-radius:999px;pointer-events:none}
+.info:empty{display:none}
+.empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;background:linear-gradient(#e6f6ff,#cdeeff);color:#7a3004;padding:16px}
+.empty[hidden]{display:none}.empty .e1{font-size:54px}.empty b{font-size:19px}.empty span{font-size:14px;opacity:.85}
+.card{display:grid;gap:8px;padding:12px;background:#fff8ea;color:#5a2b0b;border-radius:18px;box-shadow:0 8px 24px #0005;max-height:420px;overflow:hidden;transition:max-height .45s ease,opacity .3s ease,padding .45s ease}
+.racing .card{max-height:0;opacity:0;padding-top:0;padding-bottom:0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:340px){.row{grid-template-columns:1fr}}
+input,select{width:100%;height:46px;padding:0 12px;border-radius:12px;border:2px solid #f0c48a;font:inherit;font-size:16px;background:#fff;color:#333;min-width:0}
+input::placeholder{color:#a8896a}
+input:focus,select:focus{outline:3px solid #ff9a2e55;border-color:#ff9a2e}
+.btn{width:100%;height:52px;padding:0 14px;border:0;border-radius:999px;font:inherit;font-size:20px;font-weight:800;color:#fff;background:linear-gradient(#ff9a2e,#e8590c);box-shadow:0 4px 0 #a33d06;cursor:pointer}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #a33d06}
+.btn:disabled{opacity:.55;cursor:default;transform:none}
+.err{margin:0;color:#c62828;font-weight:700;font-size:14px;text-align:center}
+.err:empty{display:none}
 .modal{position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;z-index:9;padding:16px}.modal[hidden]{display:none}
 .box{background:#fff8ea;color:#5a2b0b;border-radius:24px;padding:22px;max-width:380px;width:100%;text-align:center}
-.box img{max-width:70%;max-height:160px;object-fit:contain}.box h1{color:#d8132f;margin:6px 0}.box h2{margin:0}.big{font-size:56px}
-.sn{position:fixed;top:-20px;color:#fff;opacity:.8;pointer-events:none;z-index:1;animation:fall linear infinite}
+.box img{max-width:70%;max-height:160px;object-fit:contain}.box h1{color:#d8132f;margin:6px 0}.box h2{margin:0}.box p{margin:6px 0}.big{font-size:56px;line-height:1}
+.sn{position:fixed;top:-20px;color:#fff;opacity:.75;pointer-events:none;z-index:1;animation:fall linear infinite}
 @keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){.sn{display:none}}
+@media(prefers-reduced-motion:reduce){.sn{display:none}.card{transition:none}}
