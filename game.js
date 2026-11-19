@@ -70,9 +70,9 @@ function two(s){s=String(s);if(s.length<=14)return[s];var m=s.length>>1,b=-1,i;f
 function label(txt,col,w,h){
   var c=document.createElement('canvas');c.width=360;c.height=150;
   var x=c.getContext('2d'),r=26,W=360,H=150;
-  x.fillStyle='#fffdf5';x.strokeStyle='#'+('000000'+col.toString(16)).slice(-6);x.lineWidth=10;
+  var gr=x.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#145a41');gr.addColorStop(1,'#06261b');x.fillStyle=gr;x.strokeStyle='#ffd05a';x.lineWidth=8;
   x.beginPath();x.moveTo(r,5);x.arcTo(W-5,5,W-5,H-5,r);x.arcTo(W-5,H-5,5,H-5,r);x.arcTo(5,H-5,5,5,r);x.arcTo(5,5,W-5,5,r);x.closePath();x.fill();x.stroke();
-  x.fillStyle='#8e0b22';x.font='bold 38px "Baloo 2",sans-serif';x.textAlign='center';x.textBaseline='middle';
+  x.fillStyle='#fff3c4';x.shadowColor='#000a';x.shadowBlur=4;x.font='bold 38px "Baloo 2",sans-serif';x.textAlign='center';x.textBaseline='middle';
   var L=two(txt);L.forEach(function(l,j){x.fillText(l.slice(0,16),W/2,H/2+(j-(L.length-1)/2)*42)});
   var sp=new TH.Sprite(new TH.SpriteMaterial({map:new TH.CanvasTexture(c),transparent:true,depthTest:false}));
   sp.scale.set(w||3.4,h||1.42,1);sp.renderOrder=10;return sp}
@@ -202,7 +202,7 @@ function lane(i,n,p){
   ball(gb,RB,.3,.2,.16,0,1.22,.2);ball(gb,RB,.3,.2,.16,0,1.22,-.2);ball(gb,RB,.14,.14,.14,0,1.2,0);
   gb.scale.setScalar(1.22);
   var gl=new TH.Sprite(new TH.SpriteMaterial({map:TX.glowY,transparent:true,opacity:.5,depthWrite:false,blending:TH.AdditiveBlending}));gl.scale.set(3.4,3.4,1);gl.position.set(0,.7,0);gb.add(gl);
-  var sp=label(p.ten,col,2.6,1.08);sp.position.set(0,6.4,0);ln.add(sp);
+  var sp=label(p.ten,col,2.6,1.08);sp.position.set(0,6.4+(i%3)*0.95,0);ln.add(sp);
   return {ln:ln,tg:tg,gb:gb,gl:gl,ph:Math.random()*6}}
 
 /* ================= Cây thông, nhà gỗ, quà, người tuyết (đều gộp batch) ================= */
