@@ -17,7 +17,7 @@ function beep(f,d){if(mute)return;try{var A=window.AC=window.AC||new (window.Aud
 
 /* ================= ÂM THANH: nhạc nền + nhạc đua (file mp3 để cùng thư mục với index.html) ================= */
 var AU={bgm:null,race:null,unl:0,mode:'idle'};
-function mkAu(src,vol){var a=new Audio();a.preload='auto';a.loop=true;a._v=vol;a._t=0;a._c=0;a._bad=0;a.addEventListener('error',function(){a._bad=1});a.src=src;try{a.volume=0}catch(e){}return a}
+function mkAu(src,vol,fb){var a=new Audio();a.preload='auto';a.loop=true;a._v=vol;a._t=0;a._c=0;a._bad=0;a._fb=fb||'';a.addEventListener('error',function(){if(a._fb){var u=a._fb;a._fb='';a.src=u;try{a.load()}catch(e){}if(a._t>0)auSet(a,a._t,0)}else a._bad=1});a.src=src;try{a.volume=0}catch(e){}return a}
 function auSet(a,t,rs){
   if(!a)return;a._t=t;
   if(t>0&&!mute&&AU.unl&&!a._bad&&a.paused){
@@ -35,12 +35,13 @@ function unlock(){
     if(p&&p.then)p.then(function(){r.pause();try{r.currentTime=0}catch(e){}r.muted=false}).catch(function(){r.muted=false});else r.muted=false}
   auMode(AU.mode)}
 function auInit(){
-  AU.bgm=mkAu('nhac-nen.mp3',.5);AU.race=mkAu('alex-morgan-car-car-music-545487.mp3',.8);
+  AU.bgm=mkAu('nhac-nen.mp3',.5,'https://tp9sach-ops.github.io/vongquay/nhac-nen.mp3');AU.race=mkAu('alex-morgan-car-car-music-545487.mp3',.8);
   ['pointerdown','touchend','click','keydown'].forEach(function(ev){document.addEventListener(ev,unlock,{passive:true})});
   document.addEventListener('visibilitychange',function(){
-    if(document.hidden){[AU.bgm,AU.race].forEach(function(a){if(a&&!a.paused)a.pause()})}else if(AU.unl)auMode(AU.mode)})}
+    if(document.hidden){[AU.bgm,AU.race].forEach(function(a){if(a&&!a.paused)a.pause()})}else if(AU.unl)auMode(AU.mode)});
+  window.dcEnter=function(){if(AU.unl)auMode(AU.mode);else unlock()}}
 
-/* ================= helper 3D (vật động: cọp, xe trượt, nhãn) ================= */
+/* ================= helper 3D (vật động: cọp, hộp quà, nhãn) ================= */
 function mat(c){return MT[c]||(MT[c]=new TH.MeshStandardMaterial({color:c,roughness:.5}))}
 function mb(c){return MB[c]||(MB[c]=new TH.MeshBasicMaterial({color:c}))}
 function mesh(p,g,c,sx,sy,sz,x,y,z){var m=new TH.Mesh(g,mat(c));m.scale.set(sx,sy,sz);m.position.set(x,y,z);p.add(m);return m}
@@ -121,7 +122,7 @@ function aurTex(r,g,b){var c=cv2(256,128),x=c.getContext('2d'),i,a,gr;
     x.fillStyle=gr;x.fillRect(i,0,1,128)}
   var t=new TH.CanvasTexture(c);t.wrapS=TH.RepeatWrapping;return t}
 
-/* ================= Cọp con đeo sừng hưu ================= */
+/* ================= Cọp con đội hộp quà trên đầu ================= */
 function tiger(col){
   var OR=0xff7a1a,CR=0xffe6b8,BK=0x241a17,BR=0x5a3320,AN=0xc58a3c;
   var g=new TH.Group(),b=grp(g,0,.12,0),h=grp(b,0,2.2,0),o={g:g,b:b,h:h,al:[],ll:[]};
@@ -133,37 +134,28 @@ function tiger(col){
     ball(h,0x111111,.13,.17,.13,.95,.08,s*.36);ball(h,0xffffff,.04,.05,.04,1.06,.15,s*.34);
     ball(h,0xff8aa0,.1,.07,.05,.8,-.14,s*.6);
     ball(h,BR,.06,.04,.05,.86,.48,s*.22);
-    ball(h,BR,.12,.3,.3,-.05,.74,s*.68);ball(h,CR,.08,.2,.2,.07,.74,s*.66);
+    ball(h,BR,.12,.3,.3,-.05,.74,s*.76);ball(h,CR,.08,.2,.2,.07,.74,s*.74);
     [.2,0,-.2].forEach(function(y){var x=-.25,z=.95*Math.sqrt(Math.max(0,1-Math.pow(y/.9,2)-Math.pow(x/1.05,2)));ball(h,BK,.38,.05,.12,x,y,s*(z-.01))});
     [0,1].forEach(function(j){mesh(h,GB,BK,.5,.012,.012,1.1,-.22+j*.07,s*.38).rotation.y=-s*.5});
-    var a=grp(h,-.1,.8,s*.32);a.rotation.x=s*.3;
-    mesh(a,GC,AN,.075,.8,.075,0,.4,0);ball(a,0xd8132f,.1,.1,.1,0,.82,0);
-    mesh(a,GC,AN,.06,.35,.06,.14,.41,0).rotation.z=-.9;
-    mesh(a,GC,AN,.05,.3,.05,.12,.67,0).rotation.z=-.9;
-    var ar=grp(b,.1,1.28,s*.52);ball(ar,OR,.17,.32,.17,0,-.26,0);ball(ar,CR,.13,.13,.13,0,-.52,0);o.al.push(ar);
+    var ar=grp(b,.1,1.28,s*.52);ball(ar,OR,.17,.32,.17,0,-.26,0);ball(ar,CR,.13,.13,.13,0,-.52,0);ar.rotation.x=-s*2.2;o.al.push(ar);
     var lg=grp(b,0,.42,s*.25);ball(lg,OR,.2,.32,.2,0,-.12,0);ball(lg,CR,.28,.1,.2,.09,-.4,0);o.ll.push(lg)});
   [-.4,-.1,.2].forEach(function(x){ball(h,BK,.07,.03,.2,x,.9*Math.sqrt(1-Math.pow(x/1.05,2))-.005,0)});
   o.t=grp(b,-.42,.62,0);for(var i=0;i<5;i++)ball(o.t,i%2?BK:(i==4?0xffffff:OR),.1,.1,.1,-.1*i,.03*i*i,0);
   return o}
 
-/* ================= Làn đua: cọp + xe trượt + hộp quà ================= */
+/* ================= Làn đua: mỗi cọp đội 1 hộp quà trên đầu ================= */
+var BXC=[0xd32f2f,0x1f8f55,0x2f6fd8,0xe8a317,0x8e1b3a,0x0f8f8f,0x8e24aa];
 function lane(i,n,p){
   var z=(i-(n-1)/2)*LS,ln=grp(world,0,0,z),col=COLS[i%COLS.length],tg=tiger(col);
   tg.g.scale.setScalar(1.02);ln.add(tg.g);
-  var sl=grp(ln,-3.5,0,0);
-  mesh(sl,GB,0xa3262a,1.9,.14,1.35,0,.2,0);
-  [-1,1].forEach(function(s){
-    mesh(sl,GB,0xffd54a,2.3,.07,.1,0,.06,s*.62);mesh(sl,GB,0xffd54a,.4,.07,.1,1.2,.14,s*.62).rotation.z=.6;
-    mesh(sl,GB,0xb71c1c,1.9,.32,.08,0,.38,s*.66)});
-  var gb=grp(sl,0,.24,0),RB=i%2?0xffffff:0xffd54a,BX=i%2?0x1f8f55:0xd32f2f;
-  mesh(gb,GB,BX,1.1,.95,1.1,0,.5,0);mesh(gb,GB,BX,1.25,.22,1.25,0,1.05,0);
-  mesh(gb,GB,RB,1.14,.99,.2,0,.5,0);mesh(gb,GB,RB,.2,.99,1.14,0,.5,0);
-  mesh(gb,GB,RB,1.28,.26,.2,0,1.05,0);mesh(gb,GB,RB,.2,.26,1.28,0,1.05,0);
-  ball(gb,RB,.3,.2,.16,0,1.32,.18);ball(gb,RB,.3,.2,.16,0,1.32,-.18);ball(gb,RB,.14,.14,.14,0,1.27,0);
-  var gl=new TH.Sprite(new TH.SpriteMaterial({map:TX.glowY,transparent:true,opacity:.5,depthWrite:false,blending:TH.AdditiveBlending}));gl.scale.set(3.6,3.6,1);gl.position.set(0,1,0);gb.add(gl);
-  mesh(ln,GC,0xf5e6c8,.03,2.4,.03,-1.3,.65,0).rotation.z=Math.PI/2;
-  var sp=label(p.ten,col);sp.position.set(-3.5,2.9,0);ln.add(sp);
-  return {ln:ln,tg:tg,sl:sl,gb:gb,gl:gl,ph:Math.random()*6}}
+  var BX=BXC[i%BXC.length],RB=BX==0xe8a317?0xffffff:0xffd54a,gb=grp(tg.h,0,.76,0);
+  mesh(gb,GB,BX,1.0,.9,.84,0,.45,0);mesh(gb,GB,BX,1.12,.2,.96,0,.98,0);
+  mesh(gb,GB,RB,1.04,.94,.16,0,.45,0);mesh(gb,GB,RB,.16,.94,.88,0,.45,0);
+  mesh(gb,GB,RB,1.16,.24,.16,0,.98,0);mesh(gb,GB,RB,.16,.24,1.0,0,.98,0);
+  ball(gb,RB,.3,.2,.16,0,1.22,.2);ball(gb,RB,.3,.2,.16,0,1.22,-.2);ball(gb,RB,.14,.14,.14,0,1.2,0);
+  var gl=new TH.Sprite(new TH.SpriteMaterial({map:TX.glowY,transparent:true,opacity:.5,depthWrite:false,blending:TH.AdditiveBlending}));gl.scale.set(3.4,3.4,1);gl.position.set(0,.7,0);gb.add(gl);
+  var sp=label(p.ten,col,3.0,1.25);sp.position.set(0,6.1,0);ln.add(sp);
+  return {ln:ln,tg:tg,gb:gb,gl:gl,ph:Math.random()*6}}
 
 /* ================= Cây thông, nhà gỗ, quà, người tuyết (đều gộp batch) ================= */
 var TIERS=[[2.1,2.3,1.9,0x0f5a3a],[1.8,2.2,3.2,0x146b45],[1.45,2.0,4.4,0x1b7d4d],[1.05,1.8,5.5,0x239457]];
@@ -295,12 +287,13 @@ function pose(l,x,v,dt,i,rt){
   g.b.position.y=.12+Math.abs(s)*.16*k+(1-k)*Math.sin(tm*2+i)*.02;
   g.t.rotation.y=Math.sin(l.ph*.7+i)*.5;
   g.h.rotation.z=Math.sin(l.ph)*.05*k-.03;
-  l.sl.position.y=Math.abs(Math.sin(l.ph*.5))*.06*k;
+  g.al[0].rotation.x=2.2;g.al[1].rotation.x=-2.2;
+  l.gb.rotation.z=Math.sin(l.ph)*.07*k;l.gb.rotation.x=Math.sin(l.ph*.5)*.04*k;
   l.gl.material.opacity=.42+.2*Math.sin(tm*3+i);
   var j=0,ry=0;
   if(plan&&i==plan.W&&rt>DUR){var q=rt-DUR;j=Math.abs(Math.sin(q*6))*.7;ry=Math.sin(q*3)*.6}
   g.g.position.y=j;g.g.rotation.y=ry;
-  if(state=='intro'&&i==(LP.length>>1)){g.al[0].rotation.z=2.5+Math.sin(tm*10)*.35;g.g.position.y=Math.abs(Math.sin(tm*4))*.22;g.g.rotation.y=-.3+Math.sin(tm*2)*.1}}
+  if(state=='intro'&&i==(LP.length>>1)){g.al[1].rotation.x=-2.2-Math.abs(Math.sin(tm*8))*.7;g.g.position.y=Math.abs(Math.sin(tm*4))*.22;g.g.rotation.y=-.3+Math.sin(tm*2)*.1}}
 
 function fit(){
   var cv=$('cv'),w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;
@@ -338,14 +331,14 @@ function cam(now,dt){
   if(state=='intro'){
     t=(now-introT0)/1000;zc=((LP.length>>1)-(n-1)/2)*LS;k=1000;
     if(t<1.6){u=ease(t/1.6);p=mix([-18,17,hw+38],[36,8.5,hw+25],u);l=mix([26,1,-2],[50,1.5,0],u);zt=1.18-.18*u}
-    else if(t<2.6){u=ease((t-1.6)/1);p=mix([4.6,1.6,zc+10],[2.6,2.2,zc+5.4],u);l=[0,2.0,zc];zt=1-.12*u}
-    else{u=ease((t-2.6)/1.4);p=mix([2.6,2.2,zc+5.4],iP,u);l=mix([0,2.0,zc],iL,u);zt=.88+.12*u}
+    else if(t<2.6){u=ease((t-1.6)/1);p=mix([4.6,2.4,zc+11],[2.8,2.6,zc+6.6],u);l=[0,2.6,zc];zt=1-.1*u}
+    else{u=ease((t-2.6)/1.4);p=mix([2.8,2.6,zc+6.6],iP,u);l=mix([0,2.6,zc],iL,u);zt=.9+.1*u}
   }else if((state=='race'||state=='done')&&plan){
     rt=(now-plan.t0)/1000;zW=(plan.W-(n-1)/2)*LS;
     if(rt<3.4){p=[CAMX-9,2.7+hw*.3,hw+8+hw*.5];l=[CAMX+6,1.2,-hw*.12];zt=1.04;k=2.2}
     else if(rt<DUR-3.4){p=[CAMX-3,4.8+hw*.55,hw*1.3+11+Math.sin(tm*.5)*1.5];l=[CAMX+7,1,0];k=1.8}
     else if(rt<DUR+.8){u=(rt-(DUR-3.4))/4.2;p=[FIN+5+hw*1.05,2.2+hw*.3,hw*.5];l=[FIN-8,1.4,-hw*.08];zt=1-.2*ease(u);k=2.6;sh=.015+.06*u}
-    else{u=rt-DUR-.8;ph=Math.PI*(.28+.1*u);rr=7+hw*.25;p=[FIN-1+Math.cos(ph)*rr*1.3,2.6+Math.sin(u*.8)*.4+hw*.08,zW+Math.sin(ph)*rr];l=[FIN-1,2,zW];zt=.9;k=2.4}
+    else{u=rt-DUR-.8;ph=Math.PI*(.28+.1*u);rr=7+hw*.25;p=[FIN-1+Math.cos(ph)*rr*1.3,3.2+Math.sin(u*.8)*.4+hw*.08,zW+Math.sin(ph)*rr];l=[FIN-1,2.6,zW];zt=.9;k=2.4}
   }else{p=[iP[0],iP[1]+Math.sin(tm*.7)*.12,iP[2]];l=iL;k=4}
   p=[l[0]+(p[0]-l[0])*K,l[1]+(p[1]-l[1])*K,l[2]+(p[2]-l[2])*K];
   if(!camSet){CP.set(p[0],p[1],p[2]);CL.set(l[0],l[1],l[2]);zoom=zt;camSet=1}
@@ -464,7 +457,7 @@ function build(){
   if(busy)return;
   P=(D&&D.prizes[ST])||[];LP=P.slice(0,MAXL);buildScene();
   $('empty').hidden=!!LP.length||unkNow();$('sp').disabled=!LP.length;
-  $('info').textContent=LP.length?'Có '+LP.length+' cọp – mỗi cọp kéo 1 món quà':(unkNow()?'Đang tải quà của cửa hàng…':'')}
+  $('info').textContent=LP.length?'Có '+LP.length+' cọp – mỗi cọp đội 1 món quà':(unkNow()?'Đang tải quà của cửa hàng…':'')}
 function unkNow(){return !!(D&&D.unk&&D.unk[ST])}
 function lazy(){
   if(!unkNow())return;var s=ST;
@@ -506,7 +499,7 @@ function init(){
   mkSky();decor();mkSnow();PUF=mkPts(180,0xffffff,.6,0);CNF=mkPts(200,0xffffff,.55,1)}
 
 try{init()}catch(e){$('er').textContent='Thiết bị không hỗ trợ hiển thị 3D';return}
-auInit();snow();
+auInit();snow();if(window.__gate)window.dcEnter();
 $('sp').onclick=go;
 $('st').onchange=function(){ST=this.value;ls('st',ST);build();lazy()};
 $('mute').onclick=function(){mute=!mute;this.textContent=mute?'🔇':'🔊';auMode(AU.mode)};
