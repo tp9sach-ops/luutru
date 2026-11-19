@@ -1,1 +1,30 @@
-<!DOCTYPE html><html lang='vi'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Đua Cọp May Mắn – 9 Sạch</title><meta http-equiv='refresh' content='0;url=duacop/'><script>location.replace('duacop/'+location.search+location.hash)</script></head><body><p><a href='duacop/'>Bấm vào đây để vào game Đua Cọp</a></p></body></html>
+<!DOCTYPE html><html lang='vi'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,viewport-fit=cover'><meta name='theme-color' content='#0e6b43'><title>Đua Cọp May Mắn – 9 Sạch</title><link rel='preconnect' href='https://fonts.googleapis.com'><link href='https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap' rel='stylesheet'><link rel='stylesheet' href='style.css'></head><body>
+<div class='app'>
+<header class='top'>
+<img id='logo' class='logo' alt='9 Sạch' hidden>
+<div class='hd'><h1 class='ttl'>ĐUA CỌP MAY MẮN</h1><p class='sub'>Cọp nào kéo quà về đích trước, quà đó là của bạn</p></div>
+<button id='mute' class='mute' aria-label='Bật tắt âm thanh'>🔊</button>
+</header>
+<div class='rule'>Hóa đơn từ <b id='mn'>199.000</b>đ được đua 1 lần</div>
+<div class='stage'>
+<canvas id='cv'></canvas>
+<div id='cd' class='cd' hidden></div>
+<div id='empty' class='empty' hidden><div class='e1'>🐯</div><b>Cửa hàng này tạm hết quà</b><span>Vui lòng chọn cửa hàng khác bên dưới</span></div>
+<div id='info' class='info'></div>
+</div>
+<div class='card'>
+<select id='st' aria-label='Cửa hàng'></select>
+<div class='row'>
+<input id='nm' placeholder='Họ tên' autocomplete='name' aria-label='Họ tên'>
+<input id='ph' type='tel' inputmode='numeric' maxlength='11' placeholder='Số điện thoại' autocomplete='tel' aria-label='Số điện thoại'>
+</div>
+<input id='hd' placeholder='Số hóa đơn' aria-label='Số hóa đơn'>
+<button id='sp' class='btn'>🐯 ĐUA CỌP</button>
+<p id='er' class='err'></p>
+</div>
+</div>
+<div id='rs' class='modal' hidden><div class='box'><div class='big'>🎉</div><h2>Chúc mừng <span id='rn'></span>!</h2><img id='ri' hidden alt=''><p>Cọp của bạn đã kéo về đích</p><h1 id='rp'></h1><p>Vui lòng đưa màn hình này cho nhân viên để nhận quà. 🎅</p><button class='btn' onclick='location.reload()'>Đóng</button></div></div>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'></script>
+<script src='app.js'></script>
+<script src='game.js'></script>
+</body></html>
