@@ -6,13 +6,13 @@ Game thay cho Vòng Quay: khách bấm **ĐUA CỌP**, mỗi món quà là một
 - Dùng chung backend Google Apps Script của repo `vongquay` (cùng link `/exec`, cùng Google Sheet).
 - Máy chủ quyết định quà trúng (`spin`), game chỉ dàn cảnh để cọp kéo đúng quà đó về nhất.
 - Số cọp = số quà còn của cửa hàng đã chọn (tối đa 12 cọp).
-- Khách nhập cửa hàng, họ tên, SĐT, số hóa đơn rồi bấm đua.
+- Cửa hàng nào hết quà (không có quà đang bật, còn số lượng, tỉ lệ > 0) sẽ hiện "(hết quà)" và không chọn được.
 
-## Tệp
-- `duacop/index.html` – giao diện
-- `duacop/style.css` – kiểu dáng
-- `duacop/app.js` – kết nối máy chủ (CFG.API)
-- `duacop/game.js` – cảnh 3D (Three.js r128 qua CDN), cọp, đường đua
+## Tệp (đều nằm ở thư mục gốc)
+- `index.html` – giao diện
+- `style.css` – kiểu dáng
+- `app.js` – kết nối máy chủ (CFG.API)
+- `game.js` – cảnh 3D (Three.js r128 qua CDN), cọp, đường đua
 
 ## Mở game
-Bật GitHub Pages cho repo, mở `/duacop/`.
+Bật GitHub Pages (nhánh main, thư mục gốc), mở https://tp9sach-ops.github.io/luutru/
