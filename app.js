@@ -1,3 +1,4 @@
+(function(){try{var d=document,l=d.createElement('link');l.rel='stylesheet';l.href='premium.css?v=1';d.head.appendChild(l);var T=window.THREE;if(T&&T.WebGLRenderer&&!/[?&]classic=1/.test(location.search)){var O=T.WebGLRenderer,W=function(p){var r=new O(p);r.toneMapping=T.ACESFilmicToneMapping;r.toneMappingExposure=1;return r};W.prototype=O.prototype;T.WebGLRenderer=W}}catch(e){}})();
 window.CFG={API:'https://script.google.com/macros/s/AKfycbx80zKKqUsDDv-zvfspmSgk5rMYwvBQwVO7LOzRh_9a_W9S3QTjsjwBHRm4IHllR1kp/exec'};
 var DBG=typeof location!=='undefined'&&/[?&]debug=1/.test(location.search);
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
