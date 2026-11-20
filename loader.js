@@ -1,4 +1,4 @@
-/* LOADER v14 – nạp game.js rồi áp bản vá (find-and-replace) trước khi chạy. Vá không khớp bị bỏ qua. ?debug=1 hiển số vá áp được/hụt. ?classic=1 -> bản gốc. */
+/* LOADER v15 (cọp dựng lại theo ảnh mẫu 9 Sạch) – nạp game.js rồi áp bản vá (find-and-replace) trước khi chạy. Vá không khớp bị bỏ qua. ?debug=1 hiển số vá áp được/hụt. ?classic=1 -> bản gốc. */
 (function(){
 var V='game.js?v=13';
 function run(s){var e=document.createElement('script');e.text=s;document.body.appendChild(e)}
@@ -34,17 +34,88 @@ var P=[
 [`bb(0xe4ecff,700,.2,700,40,-.1,0);`,`bb(0xa3b5e4,700,.2,700,40,-.1,0);`],
 /* v13: vật liệu cọp/hộp quà/mũ tự phát sáng nhẹ (emissive) → màu rực rỡ, không bị xám tối dưới trời đêm */
 [`new TH.MeshStandardMaterial({color:c,roughness:.5})`,`new TH.MeshStandardMaterial({color:c,roughness:.42,emissive:c,emissiveIntensity:.15})`],
-/* 3. cọp */
-[`YL=0xffd21f`,`YL=0xffc41c`],
-[`[.72,1.02].forEach(function(y){var k=Math.sqrt(1-Math.pow((y-.95)/.62,2)),t=mesh(b,GT,BR,.5*k*1.03,.52*k*1.03,1,0,y,0);t.rotation.x=Math.PI/2});`,`/* bo song bung */`],
-[`ball(h,EY,.15,.22,.16,.97,.1,s*.37);ball(h,0x111111,.09,.14,.1,1.05,.1,s*.37);`,`ball(h,EY,.19,.28,.2,.95,.1,s*.37);ball(h,0x111111,.12,.18,.13,1.05,.1,s*.37);`],
-[`ball(h,0xffffff,.065,.085,.065,1.08,.19,s*.34);`,`ball(h,0xffffff,.085,.105,.085,1.1,.2,s*.34);`],
-[`ball(h,WH,.46,.36,.52,.8,-.3,0);`,`ball(h,WH,.5,.4,.58,.8,-.3,0);`],
-[`ball(h,0x5a2d1a,.13,.09,.16,1.17,-.12,0);`,`ball(h,0x5a2d1a,.17,.12,.2,1.17,-.12,0);`],
-[`o.t=grp(b,-.42,.62,0);`,`h.scale.setScalar(1.14);o.t=grp(b,-.42,.62,0);`],
-[`mesh(hat,GT2,0xffffff,.93,.93,.8,0,0,0).rotation.x=Math.PI/2;`,`mesh(hat,GT2,0xffffff,.84,.84,.6,0,0,0).rotation.x=Math.PI/2;`],
-[`mesh(ca,GK,SR,.86,1.5,.86,0,.72,0);ball(ca,0xffffff,.2,.2,.2,0,1.5,0);`,`mesh(ca,GK,SR,.86,.95,.86,0,.48,0);ball(ca,0xffffff,.24,.24,.24,0,.95,0);`],
-[`ca.rotation.z=.62;`,`ca.rotation.z=.9;`],
+/* 3. cọp: HÀM TIGER MỚI dựng lại theo ảnh mẫu 9 Sạch (tỉ lệ chibi, đầu to, yếm xanh, áo vàng sọc, giày trắng, tóc đen). Hàm cũ giữ lại dưới tên tigerOld (không dùng). */
+[`function tiger(col){`,`function tiger(col){
+  var YL=0xf9cb1c,WH=0xfffaf0,BK=0x1b1410,PK=0xf2909f,BL=0xf49aa6,GR=0x2e8b2a,BT=0xffd23a;
+  var g=new TH.Group(),b=grp(g,0,.12,0),u=grp(b,0,-.12,0),h=grp(u,0,2.3,0),o={g:g,b:b,h:h,al:[],ll:[],top:.58,bx:-.4},s,i;
+  h.userData.sep=1;
+  function sb(p,c,sx,sy,sz,x,y,z){return mesh(p,GM,c,sx,sy,sz,x,y,z)}
+  /* điểm trên mặt hộp sọ (bán kính .88/.8/.94, tâm y=.08): dùng để dán sọc, tóc đúng bề mặt */
+  function sk(y,z,sg){var q=1-Math.pow((y-.08)/.8,2)-Math.pow(z/.94,2);return sg*.88*Math.sqrt(Math.max(0,q))}
+  function lock(pts,r0,r1){var cu=new TH.CatmullRomCurve3(pts.map(function(p){return new TH.Vector3(p[0],p[1],p[2])})).getPoints(14),k,r;
+    for(k=0;k<cu.length;k++){r=r0+(r1-r0)*k/(cu.length-1);sb(h,BK,r,r*1.05,r,cu[k].x,cu[k].y,cu[k].z)}}
+  /* THÂN: áo vàng + yếm xanh lá + huy hiệu 9 SẠCH */
+  ball(u,YL,.38,.36,.48,0,1.5,0);
+  ball(u,GR,.48,.62,.54,0,1.0,0);ball(u,GR,.5,.28,.56,0,.68,0);
+  var lg=new TH.Mesh(GP,LGM);lg.scale.set(.38,.38,1);lg.position.set(.49,1.1,0);lg.rotation.y=Math.PI/2;u.add(lg);
+  [-1,1].forEach(function(s){sb(u,GR,.07,.28,.07,.3,1.52,s*.26);sb(u,BT,.05,.05,.05,.37,1.36,s*.26)});
+  /* TAY dang ra: tay áo vàng sọc đen, găng trắng */
+  [-1,1].forEach(function(s){var ar=grp(u,0,1.44,s*.46);ar.userData.sep=1;
+    ball(ar,YL,.16,.3,.16,0,-.25,0);
+    [-.3,-.42].forEach(function(y){mesh(ar,GT2,BK,.14,.14,.12,0,y,0).rotation.x=Math.PI/2});
+    ball(ar,WH,.18,.17,.15,0,-.64,0);sb(ar,WH,.07,.1,.07,.12,-.58,0);
+    o.al.push(ar)});
+  /* CHÂN: ống chân vàng sọc đen, giày trắng */
+  [-1,1].forEach(function(s){var lg2=grp(u,0,.52,s*.22);lg2.userData.sep=1;
+    ball(lg2,GR,.22,.16,.24,0,-.02,0);
+    sb(lg2,YL,.14,.2,.14,0,-.2,0);
+    [-.19,-.3].forEach(function(y){mesh(lg2,GT2,BK,.145,.145,.14,0,y,0).rotation.x=Math.PI/2});
+    ball(lg2,WH,.32,.13,.23,.1,-.38,0);
+    o.ll.push(lg2)});
+  /* ĐUÔI: vàng khoang đen, vòng ra sau rồi cuộn lên, chóp đen */
+  var tb=[-.4,.7,-.05];o.t=grp(u,tb[0],tb[1],tb[2]);o.t.userData.sep=1;
+  var tc=new TH.CatmullRomCurve3([[-.4,.7,-.05],[-.72,.62,-.4],[-.92,.72,-.85],[-.85,1.05,-1.15],[-.6,1.28,-1.1],[-.42,1.18,-.9],[-.5,1.02,-.78]].map(function(p){return new TH.Vector3(p[0],p[1],p[2])})).getPoints(17);
+  for(i=0;i<tc.length;i++){var tr=.15-.045*i/17;sb(o.t,(i>=15||Math.floor(i/3)%2)?BK:YL,tr,tr,tr,tc[i].x-tb[0],tc[i].y-tb[1],tc[i].z-tb[2])}
+  /* ĐẦU: đỉnh vàng, nửa dưới trắng */
+  ball(h,YL,.88,.8,.94,0,.08,0);
+  ball(h,WH,.7,.5,.64,.2,-.34,0);
+  ball(h,WH,.3,.34,.2,.62,-.12,0);
+  sb(h,PK,.07,.05,.09,.88,-.3,0);
+  sb(h,0x7a2236,.06,.07,.14,.82,-.49,0);sb(h,0xff8aa0,.05,.05,.1,.86,-.54,0);
+  [-1,1].forEach(function(s){
+    ball(h,0x2a1610,.16,.27,.23,.7,-.09,s*.37);ball(h,0x0d0d0d,.15,.24,.2,.72,-.09,s*.37);
+    sb(h,0xffffff,.05,.075,.075,.845,.02,s*.37+.06);sb(h,0xffffff,.03,.04,.04,.845,-.2,s*.37-.07);
+    sb(h,BK,.04,.03,.14,.8,.22,s*.38);
+    sb(h,BL,.04,.1,.14,.68,-.46,s*.47);
+    /* 3 sọc má dán trên mặt sọ */
+    [[.16,.0],[.0,.04],[-.16,.1]].forEach(function(q){var zz=Math.sqrt(Math.max(0,1-Math.pow((q[0]-.08)/.8,2)-Math.pow(q[1]/.88,2)))*.94;
+      var st=sb(h,BK,.3,.04,.075,q[1]-.02,q[0],s*zz*.99);st.rotation.z=q[0]*.5});
+    /* tai tròn: viền vàng sọc đen, lòng hồng lớn */
+    var er=grp(h,-.08,.64,s*.74);er.rotation.x=s*.3;er.rotation.y=-s*.45;
+    ball(er,YL,.15,.38,.38,0,0,0);ball(er,PK,.1,.27,.27,.09,0,0);
+    [-.9,-.4,.1,.6].forEach(function(a){sb(er,BK,.07,.05,.13,0,.33*Math.cos(a),.33*Math.sin(a)).rotation.x=-a})});
+  /* sọc lưng đầu: 3 thanh ngang + các sọc dọc trên đỉnh sau */
+  [[.12,.62],[-.08,.56],[-.28,.46]].forEach(function(q){sb(h,BK,.05,.05,q[1],sk(q[0],0,-1)-.005,q[0],0)});
+  [-.4,-.2,0,.2,.4].forEach(function(z,k){var y=.58-Math.abs(z)*.2;sb(h,BK,.05,.17,.05,sk(y,z,-1),y,z)});
+  /* TÓC: nhúm đen vuốt cong, bám vào đỉnh đầu */
+  ball(h,BK,.2,.12,.26,.14,.84,0);
+  lock([[.16,.82,0],[.1,.98,-.06],[.02,1.1,-.18],[-.1,1.12,-.36]],.17,.05);
+  lock([[.2,.82,.08],[.22,.97,.16],[.14,1.07,.28],[.0,1.08,.4]],.15,.05);
+  lock([[.08,.84,-.02],[-.05,1.0,.0],[-.2,1.04,.1]],.14,.05);
+  lock([[.3,.8,0],[.4,.9,-.06],[.44,.96,-.18]],.1,.04);
+  /* gộp mesh cùng vật liệu theo từng bộ phận để giảm draw call */
+  function merge(gr){var list=[],bk={},inv,k;
+    gr.updateMatrixWorld(true);inv=new TH.Matrix4().copy(gr.matrixWorld).invert();
+    (function col(n){n.children.forEach(function(c){if(c.isMesh&&c.material&&c.material.isMeshStandardMaterial)list.push(c);else if(c.isGroup&&!c.userData.sep)col(c)})})(gr);
+    list.forEach(function(m){var id=m.material.uuid;(bk[id]=bk[id]||{m:m.material,a:[]}).a.push(m)});
+    for(k in bk){var B=bk[k],np=0,ni=0,o1=0,oi=0;B.a.forEach(function(m){np+=m.geometry.attributes.position.count;ni+=m.geometry.index.count});
+      var pos=new Float32Array(np*3),nor=new Float32Array(np*3),idx=new Uint32Array(ni),v=new TH.Vector3(),nm=new TH.Matrix3(),M=new TH.Matrix4(),a,n,j;
+      B.a.forEach(function(m){M.multiplyMatrices(inv,m.matrixWorld);nm.getNormalMatrix(M);a=m.geometry.attributes;n=a.position.count;
+        for(j=0;j<n;j++){v.fromBufferAttribute(a.position,j).applyMatrix4(M);pos[(o1+j)*3]=v.x;pos[(o1+j)*3+1]=v.y;pos[(o1+j)*3+2]=v.z;
+          v.fromBufferAttribute(a.normal,j).applyMatrix3(nm).normalize();nor[(o1+j)*3]=v.x;nor[(o1+j)*3+1]=v.y;nor[(o1+j)*3+2]=v.z}
+        for(j=0;j<m.geometry.index.count;j++)idx[oi+j]=m.geometry.index.array[j]+o1;
+        o1+=n;oi+=m.geometry.index.count;m.parent.remove(m)});
+      var G=new TH.BufferGeometry();G.setAttribute('position',new TH.BufferAttribute(pos,3));G.setAttribute('normal',new TH.BufferAttribute(nor,3));G.setIndex(new TH.BufferAttribute(idx,1));
+      var MM=new TH.Mesh(G,B.m);MM.userData.own=1;gr.add(MM)}}
+  merge(h);o.ll.forEach(merge);o.al.forEach(merge);merge(o.t);merge(u);
+  return o}
+function tigerOld(col){`],
+/* hộp quà đội lên phần sau đỉnh đầu (chừa chỗ cho nhúm tóc) */
+[`gb=grp(tg.h,0,.9,0);`,`gb=grp(tg.h,tg.bx,tg.top,0);`],
+/* tay dang ra thay vì giơ lên; vẫy tay lúc giới thiệu */
+[`base=.5+.45*k;`,`base=.12+.75*k;`],
+[`g.al[0].rotation.x=2.2;g.al[1].rotation.x=-2.2;`,`g.al[0].rotation.x=.95;g.al[1].rotation.x=-.95;`],
+[`g.al[1].rotation.x=-2.2-Math.abs(Math.sin(tm*8))*.7;`,`g.al[1].rotation.x=-2.3-Math.abs(Math.sin(tm*8))*.5;`],
 [`gb.scale.setScalar(1.22);`,`gb.scale.setScalar(.85);`],
 [`tg.g.scale.setScalar(1.02);`,`tg.g.scale.setScalar(1.18);`],
 /* 4. nhãn quà (khớp lại với game.js đã sửa trực tiếp: vị trí so le i%3): mọc lên từ đỉnh hộp quà, cỡ cố định theo khoảng cách, chỉ hiện khi đua */
@@ -95,8 +166,6 @@ x.font='700 15px Arial,sans-serif';x.fillText('®',191,90);
 x.restore()}
 \nfunction drawLogo(){`],
 [`if(!LOGOC)return;var x=LOGOC.getContext('2d');x.clearRect(0,0,128,128);`,`if(!LOGOC)return;var x=LOGOC.getContext('2d');x.clearRect(0,0,256,256);try{drawLogo9(x);if(TX.logo)TX.logo.needsUpdate=true;return}catch(e){x.setTransform(2,0,0,2,0,0)}`],
-[`var lg=new TH.Mesh(GP,LGM);lg.scale.set(.5,.5,1);lg.position.set(.605,.86,0);lg.rotation.y=Math.PI/2;b.add(lg);`,`var lg=new TH.Mesh(GP,LGM);lg.scale.set(.56,.56,1);lg.position.set(.62,.66,0);lg.rotation.y=Math.PI/2;b.add(lg);`],
-[`mesh(b,GT2,col,.43,.43,.9,0,1.4,0).rotation.x=Math.PI/2;ball(b,0xffd54a,.11,.11,.11,.42,1.2,0);`,`mesh(b,GT2,0xda0e2a,.43,.43,.5,0,1.4,0).rotation.x=Math.PI/2;ball(b,0xffd54a,.07,.07,.07,.45,1.33,0);var pd=new TH.Mesh(GP,LGM);pd.scale.set(.3,.3,1);pd.position.set(.6,1.1,0);pd.rotation.y=Math.PI/2;b.add(pd);`],
 [`var sg=label('9 SẠCH',0xd8132f,2.5,1.05);sg.position.set(-7,3.4,zf-2.05);`,`var sg=new TH.Sprite(new TH.SpriteMaterial({map:TX.logo,transparent:true}));sg.scale.set(2.2,2.2,1);sg.position.set(-7,3.9,zf-2.05);`],
 [`var bn=label('9 SẠCH',0xd8132f,5.6,2);bn.position.set(FIN+1.2,10.4,0);world.add(bn);`,`var bn=new TH.Sprite(new TH.SpriteMaterial({map:TX.logo,transparent:true}));bn.scale.set(4.4,4.4,1);bn.position.set(FIN+1.2,10.6,0);world.add(bn);`],
 [`st.position.set(3.4,6.9,0);world.add(st);`,`st.position.set(3.4,6.9,0);world.add(st);var sl=new TH.Sprite(new TH.SpriteMaterial({map:TX.logo,transparent:true}));sl.scale.set(3,3,1);sl.position.set(3.4,9.4,0);world.add(sl);`]
