@@ -28,7 +28,7 @@ var tx=cx+rx*sx+cux*sy,ty=2.8+cuy*sy,tz=cz+rz*sx+cuz*sy;
 return{p:[tx-fx*D,ty-fy*D,tz-fz*D],l:[tx,ty,tz]}}
 function cam(now,dt){`],
 /* 2. dùng canh khung cho mọi trạng thái trừ intro và cảnh quay cọp thắng */
-[`baseFov=asp<1?58:(asp>2.2?34:40);`,`if(state!='intro'&&!(plan&&(state=='race'||state=='done')&&t>=DUR+.8)&&LN.length){FZ=fitCam(t,asp);p=FZ.p;l=FZ.l;zt=1;k=state=='race'?7:4;K=1;sh=(state=='race'&&t>DUR-2.4&&t<DUR+.8)?.006:0}baseFov=asp<1?58:(asp>2.2?34:40);`],
+[`baseFov=asp<1?62:(asp>2.2?34:44);`,`if(state!='intro'&&!(plan&&(state=='race'||state=='done')&&t>=DUR+.8)&&LN.length){FZ=fitCam(t,asp);p=FZ.p;l=FZ.l;zt=1;k=state=='race'?7:4;K=1;sh=(state=='race'&&t>DUR-2.4&&t<DUR+.8)?.006:0}baseFov=asp<1?62:(asp>2.2?34:44);`],
 /* 3. cảnh quay cọp thắng bắt đầu từ đúng vị trí camera đang đứng (không giật) */
 [`p=mw(WL(CAMA,3,12+hw*.9,hw*1.25+19),pO,u2);l=mw(WL(CAMA,2,.6,0),lO,u2)`,`p=mw(FZ?FZ.p:WL(CAMA,3,12+hw*.9,hw*1.25+19),pO,u2);l=mw(FZ?FZ.l:WL(CAMA,2,.6,0),lO,u2)`],
 /* 4. tên quà: hiện cả lúc chờ + lúc đua, to hơn, chữ đậm hơn, hạ thấp sát đầu cọp */
