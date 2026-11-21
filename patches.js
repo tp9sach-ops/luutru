@@ -1,4 +1,4 @@
-/* PATCHES v22 – MỤC 1: camera tự canh khung (cọp luôn nằm giữa, vừa khít, thấy đủ tên quà) + tên quà to rõ. MỤC 4: nhịp đua hồi hộp, vượt mặt tự nhiên. MỤC 5: quà hết (0%) vẫn có cọp trên đường đua nhưng không bao giờ trúng. MỤC 6: hình quà hiện phía trên bảng tên quà.
+/* PATCHES v22 – MỤC 1: camera tự canh khung (cọp luôn nằm giữa, vừa khít, thấy đủ tên quà) + tên quà to rõ. MỤC 4: nhịp đua hồi hộp, vượt mặt tự nhiên. MỤC 5: quà hết (0%) vẫn có cọp trên đường đua nhưng không bao giờ trúng. MỤC 6: hình quà hiện phía trên bảng tên quà. MỤC 7: nhãn "Hóa đơn từ 155k".
    Áp bằng find-and-replace lên game.js SAU các vá P của loader.js. Thêm mục mới: chỉ cần thêm cặp [tìm, thay] vào cuối mảng. */
 window.P22=[
 /* 1. hàm canh khung: tính vị trí từng cọp (theo tiến độ đua), căn tâm theo khung nhìn rồi lùi camera đúng bằng khoảng cần để mọi cọp + tên quà (+ hình quà nếu có) lọt khung */
@@ -62,5 +62,7 @@ sp.material.map.dispose();sp.material.map=tx;sp.material.needsUpdate=true;sp.use
 im.onload=function(){try{dr(im);tx.needsUpdate=true}catch(e){}};im.src=src;return sp}
 function label(txt,col,w,h){`],
 [`var sp=label(p.ten,col,2.9,1);`,`var sp=labelI(p.ten,col,2.9,1,IM[p.ten]);`],
-[`l.sp.scale.set(Math.max(h*2.9,.0001),Math.max(h,.0001),1);`,`l.sp.scale.set(Math.max(h*2.9,.0001),Math.max(h*(l.sp.userData.hf||1),.0001),1);`]
+[`l.sp.scale.set(Math.max(h*2.9,.0001),Math.max(h,.0001),1);`,`l.sp.scale.set(Math.max(h*2.9,.0001),Math.max(h*(l.sp.userData.hf||1),.0001),1);`],
+/* MỤC 7 – dòng "Hóa đơn từ 155k được tham gia đường đua": game.js apply() trước đây ghi đè #mn bằng MinTien của máy chủ (199.000), giờ cố định 155k. Kiểu nhãn vàng nằm trong skin2.css. */
+[`$('mn').textContent=money(c.MinTien)`,`$('mn').textContent='155k'`]
 ];
