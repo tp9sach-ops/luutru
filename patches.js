@@ -1,4 +1,4 @@
-/* PATCHES v22 – MỤC 1: camera tự canh khung (cọp luôn nằm giữa, vừa khít, thấy đủ tên quà) + tên quà to rõ. MỤC 4: nhịp đua hồi hộp, vượt mặt tự nhiên. MỤC 5: quà hết (0%) vẫn có cọp trên đường đua nhưng không bao giờ trúng. MỤC 6: hình quà hiện phía trên bảng tên quà. MỤC 7: nhãn "Hóa đơn từ 155k".
+/* PATCHES v22 – MỤC 1: camera tự canh khung (cọp luôn nằm giữa, vừa khít, thấy đủ tên quà) + tên quà to rõ. MỤC 4: nhịp đua hồi hộp, vượt mặt tự nhiên. MỤC 5: quà hết (0%) vẫn có cọp trên đường đua nhưng không bao giờ trúng. MỤC 6: hình quà hiện phía trên bảng tên quà. MỤC 7: nhãn "Hóa đơn từ 155k". MỤC 8: xuất phát chạy luôn (tốc độ vào đà ngay, không đứng đơ rồi bị kéo); tư thế sẵn sàng nằm ở tiger/tiger-runtime.js.
    Áp bằng find-and-replace lên game.js SAU các vá P của loader.js. Thêm mục mới: chỉ cần thêm cặp [tìm, thay] vào cuối mảng. */
 window.P22=[
 /* 1. hàm canh khung: tính vị trí từng cọp (theo tiến độ đua), căn tâm theo khung nhìn rồi lùi camera đúng bằng khoảng cần để mọi cọp + tên quà (+ hình quà nếu có) lọt khung */
@@ -64,5 +64,10 @@ function label(txt,col,w,h){`],
 [`var sp=label(p.ten,col,2.9,1);`,`var sp=labelI(p.ten,col,2.9,1,IM[p.ten]);`],
 [`l.sp.scale.set(Math.max(h*2.9,.0001),Math.max(h,.0001),1);`,`l.sp.scale.set(Math.max(h*2.9,.0001),Math.max(h*(l.sp.userData.hf||1),.0001),1);`],
 /* MỤC 7 – dòng "Hóa đơn từ 155k được tham gia đường đua": game.js apply() trước đây ghi đè #mn bằng MinTien của máy chủ (199.000), giờ cố định 155k. Kiểu nhãn vàng nằm trong skin2.css. */
-[`$('mn').textContent=money(c.MinTien)`,`$('mn').textContent='155k'`]
+[`$('mn').textContent=money(c.MinTien)`,`$('mn').textContent='155k'`],
+/* MỤC 8 – xuất phát chạy luôn, không đơ rồi bị kéo. Trước: tốc độ vị trí vào đà theo smoothstep 2.4 s từ 0 (đầu đua gần như đứng yên) và 3 sóng nhịp đua có biên độ đầy đủ ngay giây 0, nên chân cọp (đọc theo vận tốc) đứng đơ rồi vị trí mới kéo đi.
+   Giờ: tốc độ khởi đầu = 55% tốc độ chạy, tăng mượt lên 100% trong 1.2 s; biên độ sóng vượt mặt tăng dần trong 2.5 s đầu. mkTab vẫn chuẩn hóa nên cọp về đích đúng giờ. Phần chân chạy ngay + tư thế sẵn sàng: tiger/tiger-runtime.js. */
+[`var a=Math.min(1,t/2.4),e=a*a*(3-2*a)*.9+.1*a,u=`,`var a=Math.min(1,t/1.2),e=.55+.45*a*a*(3-2*a),g0=Math.min(1,t/2.5),u=`],
+[`m=1+.36*Math.sin(TWO*c1*3.2*t+p1)`,`m=1+g0*(.36*Math.sin(TWO*c1*3.2*t+p1)`],
+[`+.12*Math.sin(TWO*(c1+c2)*1.7*t+p1-p2);return e*m`,`+.12*Math.sin(TWO*(c1+c2)*1.7*t+p1-p2));return e*m`]
 ];
