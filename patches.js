@@ -1,11 +1,11 @@
-/* PATCHES v22 – MỤC 1: camera tự canh khung (cọp luôn nằm giữa, vừa khít, thấy đủ tên quà) + tên quà to rõ. MỤC 4: nhịp đua hồi hộp, vượt mặt tự nhiên. MỤC 5: quà hết (0%) vẫn có cọp trên đường đua nhưng không bao giờ trúng. MỤC 6: hình quà hiện phía trên bảng tên quà. MỤC 7: nhãn "Hóa đơn từ 155k". MỤC 8: xuất phát chạy luôn (tốc độ vào đà ngay, không đứng đơ rồi bị kéo); tư thế sẵn sàng nằm ở tiger/tiger-runtime.js.
+/* PATCHES v22 – MỤC 1: camera tự canh khung (cọp luôn nằm giữa, vừa khít, thấy đủ tên quà) + tên quà to rõ. MỤC 4: nhịp đua hồi hộp, vượt mặt tự nhiên. MỤC 5: quà hết (0%) vẫn có cọp trên đường đua nhưng không bao giờ trúng. MỤC 6: hình quà hiện phía trên bảng tên quà (v2: ô vuông nhỏ). MỤC 7: nhãn "Hóa đơn từ 155k". MỤC 8: xuất phát chạy luôn (tốc độ vào đà ngay, không đứng đơ rồi bị kéo); tư thế sẵn sàng nằm ở tiger/tiger-runtime.js. MỤC 9: cọp to hơn, hình quà nhỏ, logo đích nâng cao, nhạc đua không ngắt khi về đích.
    Áp bằng find-and-replace lên game.js SAU các vá P của loader.js. Thêm mục mới: chỉ cần thêm cặp [tìm, thay] vào cuối mảng. */
 window.P22=[
 /* 1. hàm canh khung: tính vị trí từng cọp (theo tiến độ đua), căn tâm theo khung nhìn rồi lùi camera đúng bằng khoảng cần để mọi cọp + tên quà (+ hình quà nếu có) lọt khung */
 [`function cam(now,dt){`,`var FZ=null;
 function fitCam(t,asp){
 var m=LN.length,rc=plan&&(state=='race'||state=='done'),PX=[],PZ=[],q,j,tq,rq,o,cx=0,cz=0,
-tv=Math.tan(baseFov*Math.PI/360),th=tv*asp,el=.56,ph=asp<1?.75:.42,YS=[0,5.2,(LN.some(function(l){return l.sp&&l.sp.userData&&l.sp.userData.hf})?12.8:9.2)],
+tv=Math.tan(baseFov*Math.PI/360),th=tv*asp,el=.56,ph=asp<1?.75:.42,YS=[0,5.2,(LN.some(function(l){return l.sp&&l.sp.userData&&l.sp.userData.hf})?10.6:9.2)],
 a,ux,uz,ce=Math.cos(el),se=Math.sin(el),fx,fy,fz,rx,rz,rl,cux,cuy,cuz,
 xmn=1e9,xmx=-1e9,ymn=1e9,ymx=-1e9,sx,sy,D=14,dx,dz,dy,xr,yu,zf,P=[];
 for(q=0;q<m;q++){
@@ -22,7 +22,7 @@ xr=dx*rx+dz*rz;yu=dx*cux+dy*cuy+dz*cuz;zf=dx*fx+dy*fy+dz*fz;
 P.push([xr,yu,zf]);
 if(j<2){xmn=Math.min(xmn,xr);xmx=Math.max(xmx,xr);ymn=Math.min(ymn,yu);ymx=Math.max(ymx,yu)}}
 sx=(xmn+xmx)/2;sy=(ymn+ymx)/2+.5;
-P.forEach(function(w){D=Math.max(D,(Math.abs(w[0]-sx)+1.8)/(.86*th)-w[2],(Math.abs(w[1]-sy)+.9)/(.8*tv)-w[2])});
+P.forEach(function(w){D=Math.max(D,(Math.abs(w[0]-sx)+1.2)/(.94*th)-w[2],(Math.abs(w[1]-sy)+.5)/(.88*tv)-w[2])});
 D=Math.min(D,130);
 var tx=cx+rx*sx+cux*sy,ty=2.8+cuy*sy,tz=cz+rz*sx+cuz*sy;
 return{p:[tx-fx*D,ty-fy*D,tz-fz*D],l:[tx,ty,tz]}}
@@ -46,17 +46,17 @@ function cam(now,dt){`],
 /* MỤC 5 – quà hết (0%) vẫn xuất hiện trên đường đua. Máy chủ gửi thêm D.show[cửa hàng] = mọi quà đang bật (kể cả hết kho / tỷ lệ 0%); D.prizes[cửa hàng] vẫn chỉ gồm quà còn quay được
    (dùng để kiểm tra cửa hàng hết quà và để khách chỉ trúng quà còn kho). Cửa hàng không còn quà nào quay được thì giữ nguyên hành vi cũ (báo hết quà). Máy chủ cũ không có D.show thì dùng danh sách cũ. */
 [`P=(D&&D.prizes[ST])||[];LP=P.slice(0,MAXL);buildScene();`,`P=(D&&D.prizes[ST])||[];LP=(P.length&&D.show&&D.show[ST]&&D.show[ST].length?D.show[ST]:P).slice(0,MAXL);buildScene();`],
-/* MỤC 6 – hình quà hiện phía TRÊN bảng tên quà. labelI() dựng sprite cao hơn: bảng tên giữ nguyên ở dưới, khung hình quà (viền vàng, nền kem) ở trên, ảnh lấy từ IM[tên quà] (ảnh quản trị tải lên tab AnhQua).
+/* MỤC 6 (v2, mục 9) – hình quà hiện phía TRÊN bảng tên quà, nay là ô VUÔNG NHỎ (96x96 trên bảng tên rộng 320) viền vàng. labelI() dựng sprite cao hơn: bảng tên giữ nguyên ở dưới, ô hình ở trên giữa, ảnh lấy từ IM[tên quà] (ảnh quản trị tải lên tab AnhQua).
    Quà chưa có ảnh thì vẫn là bảng tên như cũ. relab() nhân chiều cao sprite theo sp.userData.hf để bảng tên không đổi cỡ. */
 [`function label(txt,col,w,h){`,`function labelI(txt,col,w,h,src){
 var sp=label(txt,col,w,h);if(!src)return sp;
-var pl=sp.material.map.image,c=document.createElement('canvas'),W=320,H=300,x=c.getContext('2d'),im=new Image(),tx=new TH.CanvasTexture(c),bx=40,by=6,bw=240,bh=176,r=26;
+var pl=sp.material.map.image,c=document.createElement('canvas'),W=320,H=210,x=c.getContext('2d'),im=new Image(),tx=new TH.CanvasTexture(c),bx=112,by=4,bw=96,bh=96,r=16;
 c.width=W;c.height=H;
 function rr(){x.beginPath();x.moveTo(bx+r,by);x.arcTo(bx+bw,by,bx+bw,by+bh,r);x.arcTo(bx+bw,by+bh,bx,by+bh,r);x.arcTo(bx,by+bh,bx,by,r);x.arcTo(bx,by,bx+bw,by,r);x.closePath()}
-function dr(g){x.clearRect(0,0,W,H);x.drawImage(pl,0,190,W,110);
-if(g){var s=Math.min((bw-20)/g.width,(bh-20)/g.height);
+function dr(g){x.clearRect(0,0,W,H);x.drawImage(pl,0,100,W,110);
+if(g){var s=Math.min((bw-12)/g.width,(bh-12)/g.height);
 x.save();rr();x.fillStyle='#fffaf0';x.fill();x.clip();x.drawImage(g,bx+(bw-g.width*s)/2,by+(bh-g.height*s)/2,g.width*s,g.height*s);x.restore();
-rr();x.lineWidth=8;x.strokeStyle='#ffd05a';x.stroke()}}
+rr();x.lineWidth=6;x.strokeStyle='#ffd05a';x.stroke()}}
 dr(0);tx.needsUpdate=true;
 sp.material.map.dispose();sp.material.map=tx;sp.material.needsUpdate=true;sp.userData.hf=H/110;
 im.onload=function(){try{dr(im);tx.needsUpdate=true}catch(e){}};im.src=src;return sp}
@@ -69,5 +69,9 @@ function label(txt,col,w,h){`],
    Giờ: tốc độ khởi đầu = 55% tốc độ chạy, tăng mượt lên 100% trong 1.2 s; biên độ sóng vượt mặt tăng dần trong 2.5 s đầu. mkTab vẫn chuẩn hóa nên cọp về đích đúng giờ. Phần chân chạy ngay + tư thế sẵn sàng: tiger/tiger-runtime.js. */
 [`var a=Math.min(1,t/2.4),e=a*a*(3-2*a)*.9+.1*a,u=`,`var a=Math.min(1,t/1.2),e=.55+.45*a*a*(3-2*a),g0=Math.min(1,t/2.5),u=`],
 [`m=1+.36*Math.sin(TWO*c1*3.2*t+p1)`,`m=1+g0*(.36*Math.sin(TWO*c1*3.2*t+p1)`],
-[`+.12*Math.sin(TWO*(c1+c2)*1.7*t+p1-p2);return e*m`,`+.12*Math.sin(TWO*(c1+c2)*1.7*t+p1-p2));return e*m`]
+[`+.12*Math.sin(TWO*(c1+c2)*1.7*t+p1-p2);return e*m`,`+.12*Math.sin(TWO*(c1+c2)*1.7*t+p1-p2));return e*m`],
+/* MỤC 9 – (a) nhạc đua liền mạch: lúc cọp về đích (celebrate) trước đây chuyển sang chế độ 'win' làm nhạc đua mờ dần rồi dừng, nhạc nền vào thay; giờ giữ nhạc đua chạy tiếp (không đổi chế độ, không phát lại từ đầu).
+   (b) logo đích (biển 9 SẠCH sau cổng) nâng cao hơn để cây phía sau/trước không che mất một nửa. */
+[`snow();AU.hold=0;auMode('win')`,`snow();AU.hold=0;auMode('race')`],
+[`bn.position.set(gp[0],13.2,gp[2])`,`bn.position.set(gp[0],15.6,gp[2])`]
 ];
