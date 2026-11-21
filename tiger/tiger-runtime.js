@@ -110,7 +110,7 @@
     /* làm mượt tốc độ & pha */
     l.kk = (l.kk === undefined ? tk : l.kk) + (tk - (l.kk === undefined ? tk : l.kk)) * Math.min(1, dt * 7);
     var k = l.kk;
-    l.ph += dt * (3.2 + 12.6 * Math.min(1.3, k)) * (k > .03 ? 1 : 0) * (1 - rd);
+    l.ph += dt * (2.8 + 9.4 * Math.min(1.3, k)) * (k > .03 ? 1 : 0) * (1 - rd);
     if (rd > .01) l.ph += (Math.round(l.ph / TW) * TW - l.ph) * Math.min(1, dt * 6) * rd;   /* về pha 0: chân trái trước, tay phải trước */
     var hop = 0, ry = 0;
     if (false && st === 'intro' && ctx.mid) {   /* v19: tắt vẫy tay, cọp giữa vào thế sẵn sàng như các cọp khác */                 /* cọp giữa: vẫy tay, nhún nhảy chào */
