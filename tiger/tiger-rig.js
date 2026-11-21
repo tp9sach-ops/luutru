@@ -4,6 +4,7 @@
    Quy ước trục MÔ HÌNH: x = ngang (bên TRÁI của cọp là +x), y = lên, z = phía trước (mặt cọp nhìn về +z).
    Game dựng cọp trong nhóm xoay y=+90° để mặt nhìn về +x của đường đua.
    Mọi số đo ở đây là đơn vị mô hình gốc (cao 1.142); K là hệ số phóng sang đơn vị game.
+   v21: sửa nhịp chạy – tay và xoay hông/vai trước đây lệch pha 90° so với chân (cực trị phải trùng lúc hai chân dạng rộng nhất, tức ph = 0 và π).
    ===================================================================== */
 (function (root, factory) {
   if (typeof module !== 'undefined' && module.exports) module.exports = factory();
@@ -129,13 +130,15 @@
     var bn = Math.pow(0.5 + 0.5 * Math.cos(4 * Math.PI * ((ph / (2 * Math.PI)) - uf)), 1.4);   /* 1 = đỉnh bay, 0 = giữa pha chống */
     var dy = -0.06 * kk * (1 - bn) - 0.018 * kk;                  /* hạ khung chậu (gối gập), nảy lên khi bay */
     bounceDy = dy;
-    var lean = 0.04 + 0.09 * kk + (p.lean || 0);
-    var yawS = Math.sin(ph);                                       /* xoay hông/vai ngược nhau */
+    var lean = 0.06 + 0.15 * kk + (p.lean || 0);                   /* chạy càng nhanh càng chúi về trước */
+    /* Chân TRÁI ở phía trước nhất khi ph = 0 (và chân phải khi ph = π). Hông/vai/tay cũng đạt cực trị đúng lúc đó (cos, không phải sin):
+       hông trái đưa ra trước (xoay y âm) nên yawS = -cos(ph); vai xoay ngược lại. */
+    var yawS = -Math.cos(ph);
     g.hips = qeul(0.02 * kk * Math.cos(2 * ph), 0.14 * kk * yawS, 0.05 * kk * Math.sin(ph + 0.4));
     g.spine = qeul(lean * 0.35, -0.10 * kk * yawS, -0.03 * kk * Math.sin(ph + 0.4));
     g.chest = qeul(lean * 0.65, -0.12 * kk * yawS, 0);
-    g.neck = qeul(-lean * 0.3 + 0.03 * kk * Math.cos(2 * ph), 0.1 * kk * yawS, 0);
-    g.head = qeul(-lean * 0.6 + 0.05 * kk * Math.cos(2 * ph + 0.6) + (p.look ? 0 : 0), 0.06 * kk * yawS, 0.02 * kk * Math.sin(ph));
+    g.neck = qeul(-lean * 0.3 + 0.03 * kk * Math.cos(2 * ph), 0.05 * kk * yawS, 0);          /* đầu giữ hướng nhìn thẳng: tổng xoay y hông+ngực+cổ+đầu ≈ 0 */
+    g.head = qeul(-lean * 0.6 + 0.05 * kk * Math.cos(2 * ph + 0.6) + (p.look ? 0 : 0), 0.03 * kk * yawS, 0.02 * kk * Math.sin(ph));
     g['ear.L'] = qeul(0.30 * kk * Math.sin(2 * ph - 0.9), 0, 0.10 * kk * Math.sin(ph));
     g['ear.R'] = qeul(0.30 * kk * Math.sin(2 * ph - 0.9), 0, -0.10 * kk * Math.sin(ph));
     g.hair = qeul(0.35 * kk * Math.sin(2 * ph - 1.4) - 0.15 * kk, 0, 0.05 * kk * Math.sin(ph));
@@ -174,12 +177,12 @@
       g['shin.' + s] = { dir: [0, -Math.cos(th2), Math.sin(th2)] };
       g['foot.' + s] = { pitch: pitch, th2: th2 };
     });
-    /* tay: vung ngược chân cùng bên, khuỷu gập ~80° */
+    /* tay: vung ngược chân cùng bên (tay trái ra trước khi chân phải ra trước), khuỷu gập ~80° */
     ['L', 'R'].forEach(function (s) {
       var sg = s === 'L' ? 1 : -1, pa = ph + (sg > 0 ? Math.PI : 0);
-      var sh = 0.1 * kk + 0.85 * kk * Math.sin(pa);                    /* vai vung trước/sau */
+      var sh = 0.1 * kk + 0.85 * kk * Math.cos(pa);                    /* vai vung trước/sau: cực đại cùng lúc chân đối bên ra trước nhất */
       var ab = lerp(0.82, 0.38, kn);                                   /* độ dạng tay (rad) – chạy thì khép bớt */
-      var el = lerp(0.2, 1.25, kn) + 0.32 * kk * Math.sin(pa + 0.7);   /* gập khuỷu */
+      var el = lerp(0.2, 1.25, kn) + 0.32 * kk * Math.cos(pa - 0.2);   /* gập khuỷu thêm khi tay ở phía trước */
       g['arm.' + s] = { sh: sh, ab: ab, el: el, sg: sg };
     });
 
