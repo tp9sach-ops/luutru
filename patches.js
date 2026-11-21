@@ -1,4 +1,4 @@
-/* PATCHES v22 – MỤC 1: camera tự canh khung (cọp luôn nằm giữa, vừa khít, thấy đủ tên quà) + tên quà to rõ. MỤC 4: nhịp đua hồi hộp, vượt mặt tự nhiên. MỤC 5: quà hết (0%) vẫn có cọp trên đường đua nhưng không bao giờ trúng. MỤC 6: hình quà hiện phía trên bảng tên quà (v2: ô vuông nhỏ). MỤC 7: nhãn "Hóa đơn từ 155k". MỤC 8: xuất phát chạy luôn (tốc độ vào đà ngay, không đứng đơ rồi bị kéo); tư thế sẵn sàng nằm ở tiger/tiger-runtime.js. MỤC 9: cọp to hơn, hình quà nhỏ, logo đích nâng cao, nhạc đua không ngắt khi về đích.
+/* PATCHES v22 – MỤC 1: camera tự canh khung (cọp luôn nằm giữa, vừa khít, thấy đủ tên quà) + tên quà to rõ. MỤC 4: nhịp đua hồi hộp, vượt mặt tự nhiên. MỤC 5: quà hết (0%) vẫn có cọp trên đường đua nhưng không bao giờ trúng. MỤC 6: hình quà hiện phía trên bảng tên quà (v2: ô vuông nhỏ). MỤC 7: nhãn "Hóa đơn từ 155k". MỤC 8: xuất phát chạy luôn (tốc độ vào đà ngay, không đứng đơ rồi bị kéo); tư thế sẵn sàng nằm ở tiger/tiger-runtime.js. MỤC 9: cọp to hơn, hình quà nhỏ, logo đích nâng cao, nhạc đua không ngắt khi về đích. MỤC 10: thêm nhiều vật phẩm ĐỎ Noel vào cảnh đua (không đổi nền).
    Áp bằng find-and-replace lên game.js SAU các vá P của loader.js. Thêm mục mới: chỉ cần thêm cặp [tìm, thay] vào cuối mảng. */
 window.P22=[
 /* 1. hàm canh khung: tính vị trí từng cọp (theo tiến độ đua), căn tâm theo khung nhìn rồi lùi camera đúng bằng khoảng cần để mọi cọp + tên quà (+ hình quà nếu có) lọt khung */
@@ -73,5 +73,11 @@ function label(txt,col,w,h){`],
 /* MỤC 9 – (a) nhạc đua liền mạch: lúc cọp về đích (celebrate) trước đây chuyển sang chế độ 'win' làm nhạc đua mờ dần rồi dừng, nhạc nền vào thay; giờ giữ nhạc đua chạy tiếp (không đổi chế độ, không phát lại từ đầu).
    (b) logo đích (biển 9 SẠCH sau cổng) nâng cao hơn để cây phía sau/trước không che mất một nửa. */
 [`snow();AU.hold=0;auMode('win')`,`snow();AU.hold=0;auMode('race')`],
-[`bn.position.set(gp[0],13.2,gp[2])`,`bn.position.set(gp[0],15.6,gp[2])`]
+[`bn.position.set(gp[0],13.2,gp[2])`,`bn.position.set(gp[0],15.6,gp[2])`],
+/* MỤC 10 – thêm vật phẩm ĐỎ Noel vào cảnh đua, KHÔNG đổi nền/đường đua: (a) bóng trang trí trên cây thông: 3/5 là đỏ; (b) bóng đèn nhấp nháy: 3/5 là đỏ, còn lại vàng/trắng;
+   (c) hộp quà ngoài đường đua: 12 -> 20 hộp, phần lớn đỏ ruy băng vàng, xen hộp trắng ruy băng đỏ (trước là xanh lá/đỏ xen kẽ). */
+[`var ORN=[0xd8132f,0xffd54a,0x2f6fd8,0xffffff]`,`var ORN=[0xd8132f,0xd8132f,0xffd54a,0xd8132f,0xffffff]`],
+[`var BUL=[0xff3b3b,0xffd54a,0x4fc3f7,0x7cfc8a,0xff8ad8]`,`var BUL=[0xff3b3b,0xffd54a,0xff3b3b,0xffffff,0xff3b3b]`],
+[`for(k=0;k<12;k++){a=k*TWO/12+.4;r=Ro+3.8+(k%2)*1.6;bgift(`,`for(k=0;k<20;k++){a=k*TWO/20+.4;r=Ro+3.8+(k%2)*1.6;bgift(`],
+[`k%2?0x1f8f55:0xd32f2f,k%2?0xffffff:0xffd54a,k)}`,`k%3?0xd32f2f:0xffffff,k%3?0xffd54a:0xd32f2f,k)}`]
 ];
