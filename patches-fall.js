@@ -38,7 +38,7 @@ function mkTab(f,c1,c2,p1,p2,WS,FT){var nz=mkPace(f);`],
 [`var f=[],tab=[],mx=DUR;`,`var f=[],tab=[],mx=DUR,FT=pickFalls(LP.length,wi);LN.forEach(function(l){l.dz=0});`],
 [`Math.random()*TWO,Math.random()*TWO,i==wi?.22+Math.random()*.2:0))}`,`Math.random()*TWO,Math.random()*TWO,i==wi?.22+Math.random()*.2:0,FT[i]))}`],
 [`plan={W:wi,f:f,tab:tab,mx:mx,t0:performance.now(),r:r,win:0};`,`plan={W:wi,f:f,tab:tab,mx:mx,t0:performance.now(),r:r,win:0,FT:FT};`],
-[`mid:i==(LP.length>>1)});`,`mid:i==(LP.length>>1),fall:(plan&&plan.FT&&state=='race'&&plan.FT[i]!==undefined)?plan.FT[i]:-1});`],
+[`mid:i==(LP.length>>1)});`,`mid:i==(LP.length>>1)&&state=='intro'&&performance.now()-introT0<2300,fall:(plan&&plan.FT&&state=='race'&&plan.FT[i]!==undefined)?plan.FT[i]:-1});`],
 /* bụi tung lên đúng lúc cọp chạm đất */
 [`l.v=v;pose(l,0,v,dt,i,rt);place(l,i,n,th)});`,`l.v=v;pose(l,0,v,dt,i,rt);place(l,i,n,th);
 if(plan&&plan.FT&&state=='race'&&plan.FT[i]>=0&&!l.dz&&rt-plan.FT[i]>.5){l.dz=1;var fo=l.ln.position,fs=Math.sin(l.th),fc=Math.cos(l.th),fq;for(fq=0;fq<26;fq++)emit(PUF,fo.x+fs*(Math.random()-.5)*1.4,.3,fo.z-fc*(Math.random()-.5)*1.4,(Math.random()-.5)*4,.6+Math.random()*2.2,(Math.random()-.5)*4,.7+Math.random()*.6)}});`]
