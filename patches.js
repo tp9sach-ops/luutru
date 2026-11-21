@@ -1,4 +1,4 @@
-/* PATCHES v22 – MỤC 1: camera tự canh khung (cọp luôn nằm giữa, vừa khít, thấy đủ tên quà) + tên quà to rõ.
+/* PATCHES v22 – MỤC 1: camera tự canh khung (cọp luôn nằm giữa, vừa khít, thấy đủ tên quà) + tên quà to rõ. MỤC 4: nhịp đua hồi hộp, vượt mặt tự nhiên.
    Áp bằng find-and-replace lên game.js SAU các vá P của loader.js. Thêm mục mới: chỉ cần thêm cặp [tìm, thay] vào cuối mảng. */
 window.P22=[
 /* 1. hàm canh khung: tính vị trí từng cọp (theo tiến độ đua), căn tâm theo khung nhìn rồi lùi camera đúng bằng khoảng cần để mọi cọp + tên quà lọt khung */
@@ -37,5 +37,10 @@ function cam(now,dt){`],
 [`x.font='bold 46px "Baloo 2",sans-serif'`,`x.font='800 52px "Be Vietnam Pro","Baloo 2",sans-serif'`],
 [`(j-(L.length-1)/2)*48`,`(j-(L.length-1)/2)*54`],
 [`if(s.length<=14)return[s]`,`if(s.length<=12)return[s]`],
-[`sp.position.set(0,6.1+(i%3)*.9,0)`,`sp.position.set(0,5.7+(i%3)*.8,0)`]
+[`sp.position.set(0,6.1+(i%3)*.9,0)`,`sp.position.set(0,5.7+(i%3)*.8,0)`],
+/* MỤC 4 – nhịp đua hồi hộp. Tốc độ mỗi cọp = 3 sóng sin chậm chồng nhau (chu kỳ ~3-6 s, mượt, không bậc thang) nên cọp lúc dẫn lúc tụt, vượt mặt qua lại;
+   mkTab vẫn chuẩn hóa để cọp về đích đúng giờ định sẵn (cọp thắng luôn về trước). Cọp thắng có thêm cú nước rút cuối (WS) nên hay "lội ngược dòng". */
+[`function mkTab(f,c1,c2,p1,p2){`,`function mkTab(f,c1,c2,p1,p2,WS){`],
+[`function sp(t){var a=Math.min(1,t/2.4);return(a*a*(3-2*a)*.9+.1*a)*(1+.1*Math.sin(TWO*c1*t+p1)+.06*Math.sin(TWO*c2*t+p2))}`,`function sp(t){var a=Math.min(1,t/2.4),e=a*a*(3-2*a)*.9+.1*a,u=Math.max(0,Math.min(1,(t-(f-7))/6)),sw=u*u*(3-2*u),m=1+.36*Math.sin(TWO*c1*3.2*t+p1)+.2*Math.sin(TWO*c2*2.2*t+p2)+.12*Math.sin(TWO*(c1+c2)*1.7*t+p1-p2);return e*m*(1+(WS||0)*sw)}`],
+[`tab.push(mkTab(fi,.05+Math.random()*.04,.11+Math.random()*.06,Math.random()*TWO,Math.random()*TWO))}`,`tab.push(mkTab(fi,.05+Math.random()*.04,.11+Math.random()*.06,Math.random()*TWO,Math.random()*TWO,i==wi?.22+Math.random()*.2:0))}`]
 ];
