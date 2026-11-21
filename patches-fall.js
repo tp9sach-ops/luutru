@@ -1,5 +1,6 @@
 /* PATCHES-FALL (P23) – cọp VẤP TÉ rồi đứng dậy chạy tiếp. Áp sau P22 (loader.js nối window.P23 vào P22).
    Té theo xác suất (cấu hình ở TIGER_FALL bên dưới), cọp trúng quà té xong vẫn về nhất (mkTab chuẩn hóa quãng đường nên giờ về đích không đổi). */
+window.SLOWMO = { a: 1.8, b: .4, s: .45 };   /* quay chậm về đích: a = giây trước DUR bắt đầu, b = giây sau DUR kết thúc, s = tốc độ (0,45 = chậm còn 45%) */
 window.TIGER_FALL = {
   base: 0.18,            /* xác suất mỗi cọp té trong 1 ván (0..1) */
   row: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],   /* hệ số nhân theo HÀNG (làn) 1..12: 2 = dễ té gấp đôi, 0 = không bao giờ té. Hàng 1 là hàng đầu tiên theo thứ tự quà */
@@ -63,5 +64,7 @@ if(plan.FT)for(i=0;i<n;i++)if(plan.FT[i]>=0&&rt>plan.FT[i]+.15&&!CM.fl2[i]){CM.f
 if(!CM.sp&&rt>DUR-5){CM.sp=1;CM.last=rt;cmShow('Nước rút cuối! Sắp về đích!',2000)}
 if(!CM.fin&&rt>=DUR-.1){CM.fin=1;cmShow('Cọp '+LP[plan.W].ten+' về nhất!',2800);if(CM.fl){CM.fl.style.transition='none';CM.fl.style.opacity=.85;setTimeout(function(){CM.fl.style.transition='opacity .7s';CM.fl.style.opacity=0},60)}}}
 function relab(){`],
-[`if(state=='race'&&plan&&n){`,`cmt(rt,n);if(state=='race'&&plan&&n){`]
+[`if(state=='race'&&plan&&n){`,`cmt(rt,n);if(state=='race'&&plan&&n){`],
+/* v19: về đích QUAY CHẬM – kéo t0 tới để rt chạy ~0,45x trong khoảng DUR-1,8 .. DUR+0,4 (chỉnh SLOWMO) */
+[`var rt=plan?(now-plan.t0)/1000:0,n=LN.length;`,`var SMc=window.SLOWMO||{a:1.8,b:.4,s:.45},rt0=plan?(now-plan.t0)/1000:0,SMd=window.SMn?now-window.SMn:16;window.SMn=now;if(SMd>100||SMd<0)SMd=16;if(plan&&state=='race'&&rt0>DUR-SMc.a&&rt0<DUR+SMc.b)plan.t0+=SMd*(1-SMc.s);var rt=plan?(now-plan.t0)/1000:0,n=LN.length;`]
 ];

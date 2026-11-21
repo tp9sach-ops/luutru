@@ -102,7 +102,7 @@
     /* xuất phát: chạy luôn – sàn tốc độ chạy trong ~2.6 s đầu để chân không đứng đơ trong lúc vị trí đang tăng tốc */
     if (st === 'race' && !wingo && rt < 2.6) tk = Math.max(tk, .55 * (1 - M.sstep(1.2, 2.6, rt)));
     /* tư thế sẵn sàng: khi chưa chạy (idle, giới thiệu trừ cọp giữa đang vẫy, đếm ngược) */
-    var rdT = (!wingo && (st === 'idle' || st === 'warm' || (st === 'intro' && !ctx.mid))) ? 1 : 0;
+    var rdT = (!wingo && (st === 'idle' || st === 'warm' || st === 'intro')) ? 1 : 0;
     if (l.rd === undefined) l.rd = rdT;
     l.rd += (rdT - l.rd) * Math.min(1, dt * (rdT ? 6 : 12));
     var rd = l.rd;
@@ -113,7 +113,7 @@
     l.ph += dt * (3.2 + 12.6 * Math.min(1.3, k)) * (k > .03 ? 1 : 0) * (1 - rd);
     if (rd > .01) l.ph += (Math.round(l.ph / TW) * TW - l.ph) * Math.min(1, dt * 6) * rd;   /* về pha 0: chân trái trước, tay phải trước */
     var hop = 0, ry = 0;
-    if (st === 'intro' && ctx.mid) {                 /* cọp giữa: vẫy tay, nhún nhảy chào */
+    if (false && st === 'intro' && ctx.mid) {   /* v19: tắt vẫy tay, cọp giữa vào thế sẵn sàng như các cọp khác */                 /* cọp giữa: vẫy tay, nhún nhảy chào */
       wave = 1; hop = Math.abs(Math.sin(tm * 4)) * .22; ry = -.3 + Math.sin(tm * 2) * .1;
     }
     if (wingo) {                                     /* cọp thắng: nhảy cẫng, giơ hai tay, xoay qua lại */
