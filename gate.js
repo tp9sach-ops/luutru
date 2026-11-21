@@ -1,5 +1,5 @@
 /* Cổng vào game: chọn cửa hàng (tìm kiếm) + số hóa đơn -> đua; sau khi đua trúng quà mới nhập tên + SĐT. Cần window.DC do flow-patch.js tạo trong game.js. */
-/* v5: bỏ vẫy chào. Cọp ở cổng lặp chu kỳ 10 giây: chạy bộ tại chỗ (0-3.4 s) -> dừng lại khởi động: xoay cổ tay, xoay cổ chân, nhấc chân luân phiên (4.2-9 s) -> chạy tiếp. Nền đỏ Noel, dây đèn bóng đỏ trên đầu, viền kẹo gậy, hộp quà đỏ, cây thông có dây ruy băng + bóng đỏ, tuyết rơi. */
+/* v6: nền xanh như cũ; thêm vật phẩm ĐỎ Noel làm điểm nhấn (không đổi nền): viền kẹo gậy, dây đèn bóng đỏ + nơ + quả ô rô, hộp quà đỏ, kẹo gậy, cây thông có ruy băng và bóng đỏ. Cọp lặp chu kỳ 10 s: chạy bộ tại chỗ (0-3.4 s) -> dừng khởi động xoay cổ tay/cổ chân (4.2-9 s) -> chạy tiếp, không vẫy chào. */
 (function(){
 var $=function(i){return document.getElementById(i)},ST='',g=$('gate');
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -12,15 +12,10 @@ var SK='tg9snap1',snap=null,sty=document.createElement('style');
 sty.textContent=".gt3{position:relative;width:min(56vw,42vh,250px);aspect-ratio:5/6;margin-bottom:4px!important}.gt3:before{content:'';position:absolute;left:12%;top:18%;width:76%;height:70%;border-radius:50%;background:radial-gradient(circle,rgba(255,214,110,.5),rgba(255,214,110,0) 68%);animation:gtp 1.6s ease-in-out infinite}.gt3.snap:before,.gt3.on:before{display:none}.gt3 img,.gt3 canvas{position:absolute;left:0;top:0;width:100%;height:100%;filter:drop-shadow(0 14px 18px rgba(0,0,0,.45))}.gt3.on img{display:none}@keyframes gtp{50%{opacity:.45;transform:scale(1.08)}}@media(max-height:480px){.gt3{display:none}}@media(prefers-reduced-motion:reduce){.gt3:before{animation:none}}"+
 ".gt3 .gtree{position:absolute;bottom:3%;height:auto;z-index:0;filter:drop-shadow(0 8px 8px rgba(0,0,0,.4))}.gt3 .gtree.l{left:-34%;width:46%}.gt3 .gtree.r{right:-32%;width:40%}.gtree .o{animation:gtw 1.5s ease-in-out infinite}.gtree .o:nth-of-type(2n){animation-delay:.5s}.gtree .o:nth-of-type(3n){animation-delay:.9s}@keyframes gtw{50%{opacity:.3}}";
 document.head.appendChild(sty);
-/* v5: giao diện đỏ Noel cho cổng (nạp sau premium.css/flow.css nên thắng cùng độ ưu tiên) */
+/* v6: chừa chỗ cho dây đèn trên cùng + kiểu hộp quà/kẹo gậy dưới chân cây (nền cổng giữ nguyên màu xanh của premium.css) */
 var sty2=document.createElement('style');
-sty2.textContent="#gate{padding-top:max(58px,calc(env(safe-area-inset-top) + 50px));background:radial-gradient(circle,rgba(255,255,255,.14) 2px,transparent 2.5px) 0 0/30px 30px,radial-gradient(ellipse at 50% 24%,#e8283f 0,#b5112c 40%,#5a0716 78%,#2a030b 100%)}"+
-"#gate:before{background:repeating-conic-gradient(rgba(255,214,120,.17) 0 7deg,transparent 7deg 18deg)}"+
-"#gate h2{filter:drop-shadow(0 2px 0 #4a0512) drop-shadow(0 8px 14px rgba(0,0,0,.65))}"+
-"#gate p{color:#ffe9dc}#gate .gf label{color:#fff0c2;text-shadow:0 1px 3px rgba(0,0,0,.5)}"+
-"#gate .ge{color:#fff;background:rgba(0,0,0,.4)}"+
-"#gate .gf input{border-color:#ffd27a;box-shadow:0 4px 10px rgba(0,0,0,.25)}"+
-".gt3 .ggift{position:absolute;height:auto;z-index:0;filter:drop-shadow(0 6px 6px rgba(0,0,0,.4))}";
+sty2.textContent="#gate{padding-top:max(58px,calc(env(safe-area-inset-top) + 50px))}"+
+".gt3 .ggift,.gt3 .gcane{position:absolute;height:auto;z-index:0;filter:drop-shadow(0 6px 6px rgba(0,0,0,.4))}";
 document.head.appendChild(sty2);
 var old=g.querySelector('.gt'),box=document.createElement('div');box.className='gt3';
 /* 2 cây thông Noel (SVG) đứng hai bên cọp: 3 tầng lá, mũ tuyết, dây ruy băng đỏ, bóng đèn đỏ/vàng nhấp nháy, ngôi sao vàng */
@@ -28,20 +23,23 @@ var TREE="<svg class='gtree #' viewBox='0 0 100 150' aria-hidden='true'><defs><l
 "<path d='M19 112Q50 128 81 112' fill='none' stroke='#e0243f' stroke-width='3.4' stroke-linecap='round'/><path d='M23 80Q50 93 77 80' fill='none' stroke='#e0243f' stroke-width='3.4' stroke-linecap='round'/><path d='M28 52Q50 63 72 52' fill='none' stroke='#e0243f' stroke-width='3.4' stroke-linecap='round'/>"+
 "<circle class='o' cx='38' cy='122' r='4.4' fill='#e0243f'/><circle class='o' cx='62' cy='118' r='4' fill='#ffd54a'/><circle class='o' cx='80' cy='126' r='4' fill='#e0243f'/><circle class='o' cx='24' cy='127' r='3.8' fill='#ffd54a'/><circle class='o' cx='44' cy='100' r='4' fill='#e0243f'/><circle class='o' cx='62' cy='94' r='3.8' fill='#ffd54a'/><circle class='o' cx='36' cy='70' r='3.6' fill='#e0243f'/><circle class='o' cx='60' cy='66' r='3.6' fill='#e0243f'/><circle class='o' cx='46' cy='44' r='3.4' fill='#ffd54a'/><circle class='o' cx='55' cy='36' r='3.2' fill='#e0243f'/>"+
 "<polygon points='50,1 52.4,6.8 58.6,7.2 53.8,11.2 55.3,17.3 50,14 44.7,17.3 46.2,11.2 41.4,7.2 47.6,6.8' fill='#ffd54a' stroke='#e8a317' stroke-width='.8'/></svg>";
-/* hộp quà đỏ/trắng ruy băng vàng đặt dưới chân cây */
+/* hộp quà đỏ/trắng ruy băng vàng/đỏ + kẹo gậy đỏ-trắng đặt dưới chân cây */
 function gift(b,l,r,st){return"<svg class='ggift' style='"+st+"' viewBox='0 0 60 60' aria-hidden='true'><rect x='5' y='25' width='50' height='33' rx='3' fill='"+b+"'/><rect x='3' y='17' width='54' height='11' rx='3' fill='"+l+"'/><rect x='26' y='17' width='8' height='41' fill='"+r+"'/><path d='M30 17C21 3 8 7 13 14C17 19 27 17 30 17ZM30 17C39 3 52 7 47 14C43 19 33 17 30 17Z' fill='none' stroke='"+r+"' stroke-width='3.6' stroke-linejoin='round'/></svg>"}
+function cane(st){return"<svg class='gcane' style='"+st+"' viewBox='0 0 40 84' aria-hidden='true'><path d='M12 82V24C12 6 34 6 34 24' fill='none' stroke='#fff' stroke-width='9'/><path d='M12 82V24C12 6 34 6 34 24' fill='none' stroke='#d4112e' stroke-width='9' stroke-dasharray='7 7'/></svg>"}
 box.innerHTML=TREE.replace(/#gtg@/g,'#gtgL').replace(/id='gtg@'/,"id='gtgL'").replace('#','l')+TREE.replace(/#gtg@/g,'#gtgR').replace(/id='gtg@'/,"id='gtgR'").replace('#','r')+
- gift('#d4112e','#e8283f','#ffd54a','left:-27%;bottom:0;width:21%')+gift('#f6efe2','#ffffff','#d4112e','left:-7%;bottom:-1%;width:15%')+gift('#d4112e','#e8283f','#ffd54a','right:-25%;bottom:0;width:19%')+gift('#f6efe2','#ffffff','#d4112e','right:-9%;bottom:-1%;width:13%');
+ gift('#d4112e','#e8283f','#ffd54a','left:-27%;bottom:0;width:21%')+gift('#f6efe2','#ffffff','#d4112e','left:-7%;bottom:-1%;width:15%')+gift('#d4112e','#e8283f','#ffd54a','right:-25%;bottom:0;width:19%')+gift('#f6efe2','#ffffff','#d4112e','right:-9%;bottom:-1%;width:13%')+
+ cane('left:-19%;bottom:12%;width:6.5%;transform:rotate(-10deg)')+cane('right:-17%;bottom:11%;width:6%;transform:rotate(10deg)');
 try{snap=localStorage.getItem(SK)}catch(e){}
 if(snap&&/^data:image\/(webp|png);base64,/.test(snap)){var im=new Image();im.alt='';im.src=snap;box.appendChild(im);box.classList.add('snap')}
 if(old)old.parentNode.replaceChild(box,old);else g.insertBefore(box,g.firstChild);
 /* tuyết rơi phủ toàn màn hình cổng (dưới nội dung, trên nền) */
 var sc=document.createElement('canvas');sc.style.cssText='position:absolute!important;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0!important;margin:0!important';g.insertBefore(sc,g.firstChild);
-/* v5: viền kẹo gậy đỏ-trắng trên cùng + dây đèn/bóng đỏ treo dưới viền */
-var cane=document.createElement('div');cane.setAttribute('aria-hidden','true');cane.style.cssText='position:absolute!important;left:0;top:0;width:100%;height:8px;z-index:0!important;margin:0!important;pointer-events:none;background:repeating-linear-gradient(-45deg,#fff 0 9px,#d4112e 9px 18px);box-shadow:0 2px 6px rgba(0,0,0,.35)';
-var GT="<svg xmlns='http://www.w3.org/2000/svg' width='84' height='46' viewBox='0 0 84 46'><path d='M-2 6Q42 40 86 6' fill='none' stroke='#14643a' stroke-width='8' stroke-linecap='round'/><path d='M-2 6Q42 40 86 6' fill='none' stroke='#2fae6a' stroke-width='3' stroke-dasharray='2 5' stroke-linecap='round'/><path d='M0 6L-10 -1L-10 13ZM0 6L10 -1L10 13Z' fill='#e0243f'/><circle cx='0' cy='6' r='3.4' fill='#a3102a'/><path d='M84 6L74 -1L74 13ZM84 6L94 -1L94 13Z' fill='#e0243f'/><circle cx='84' cy='6' r='3.4' fill='#a3102a'/><circle cx='20' cy='19' r='2.4' fill='#ffd54a'/><circle cx='64' cy='19' r='2.4' fill='#ffd54a'/><rect x='39' y='23.5' width='6' height='3.6' rx='1' fill='#ffd05a'/><circle cx='42' cy='34' r='7' fill='#e0243f'/><circle cx='39.4' cy='31.4' r='2' fill='#fff' fill-opacity='.65'/></svg>";
+/* viền kẹo gậy đỏ-trắng trên cùng + dây đèn xanh có nơ đỏ, quả ô rô, bóng đỏ treo dưới viền */
+var cane0=document.createElement('div');cane0.setAttribute('aria-hidden','true');cane0.style.cssText='position:absolute!important;left:0;top:0;width:100%;height:8px;z-index:0!important;margin:0!important;pointer-events:none;background:repeating-linear-gradient(-45deg,#fff 0 9px,#d4112e 9px 18px);box-shadow:0 2px 6px rgba(0,0,0,.35)';
+var HOLLY=function(x){return"<ellipse cx='"+(x-6)+"' cy='14' rx='6' ry='2.4' fill='#1f9a55' transform='rotate(30 "+(x-6)+" 14)'/><ellipse cx='"+(x+6)+"' cy='14' rx='6' ry='2.4' fill='#1f9a55' transform='rotate(-30 "+(x+6)+" 14)'/><circle cx='"+(x-1)+"' cy='16' r='2.4' fill='#e0243f'/><circle cx='"+(x+2.5)+"' cy='17.5' r='2.4' fill='#e0243f'/><circle cx='"+x+"' cy='19.5' r='2.4' fill='#c8102e'/>"};
+var GT="<svg xmlns='http://www.w3.org/2000/svg' width='84' height='46' viewBox='0 0 84 46'><path d='M-2 6Q42 40 86 6' fill='none' stroke='#14643a' stroke-width='8' stroke-linecap='round'/><path d='M-2 6Q42 40 86 6' fill='none' stroke='#2fae6a' stroke-width='3' stroke-dasharray='2 5' stroke-linecap='round'/><path d='M0 6L-10 -1L-10 13ZM0 6L10 -1L10 13Z' fill='#e0243f'/><circle cx='0' cy='6' r='3.4' fill='#a3102a'/><path d='M84 6L74 -1L74 13ZM84 6L94 -1L94 13Z' fill='#e0243f'/><circle cx='84' cy='6' r='3.4' fill='#a3102a'/>"+HOLLY(0)+HOLLY(84)+"<circle cx='20' cy='19' r='2.4' fill='#ffd54a'/><circle cx='64' cy='19' r='2.4' fill='#ffd54a'/><rect x='39' y='23.5' width='6' height='3.6' rx='1' fill='#ffd05a'/><circle cx='42' cy='34' r='7' fill='#e0243f'/><circle cx='39.4' cy='31.4' r='2' fill='#fff' fill-opacity='.65'/></svg>";
 var gar=document.createElement('div');gar.setAttribute('aria-hidden','true');gar.style.cssText='position:absolute!important;left:0;top:8px;width:100%;height:46px;z-index:0!important;margin:0!important;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.3));background:url("data:image/svg+xml,'+encodeURIComponent(GT)+'") repeat-x 0 0/84px 46px';
-g.insertBefore(gar,g.firstChild);g.insertBefore(cane,g.firstChild);
+g.insertBefore(gar,g.firstChild);g.insertBefore(cane0,g.firstChild);
 var sx=sc.getContext('2d'),fl=[],SW=0,SH=0,fi;
 function rs(){SW=sc.width=g.clientWidth||300;SH=sc.height=g.clientHeight||600}rs();window.addEventListener('resize',rs);
 for(fi=0;fi<90;fi++)fl.push({x:Math.random(),y:Math.random(),r:1+Math.random()*2.6,v:.08+Math.random()*.12,p:Math.random()*6.3,w:.3+Math.random()*.7});
