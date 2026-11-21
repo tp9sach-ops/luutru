@@ -6,14 +6,18 @@ function fold(s){return String(s==null?'':s).normalize('NFD').replace(/[\u0300-\
 function D(){return window.DC?window.DC.d():null}
 function has(d,s){return((d.prizes||{})[s]||[]).length>0||!!(d.unk&&d.unk[s])}
 if(!g)return;
-/* Cọp 3D ở cổng: dùng đúng mô hình có xương của game (logo 9 SẠCH trước ngực, băng đô marathon, đuôi). Trong lúc chờ nạp, hiện logo. */
-var sty=document.createElement('style');sty.textContent=".gt3{position:relative;width:min(56vw,42vh,250px);aspect-ratio:5/6;margin-bottom:4px!important}.gt3 img{position:absolute;left:20%;top:22%;width:60%;filter:drop-shadow(0 10px 16px rgba(0,0,0,.4))}.gt3 canvas{position:absolute;left:0;top:0;width:100%;height:100%;filter:drop-shadow(0 14px 18px rgba(0,0,0,.45))}.gt3.on img{display:none}@media(max-height:480px){.gt3{display:none}}";document.head.appendChild(sty);
-var old=g.querySelector('.gt'),box=document.createElement('div');box.className='gt3';box.innerHTML="<img alt='9 Sạch'>";box.firstChild.src=window.L9URL||'logo-9sach.png?v=2';
+/* Cọp 3D ở cổng: dùng đúng mô hình có xương của game. Không còn logo/hình cũ làm placeholder: lần đầu hiện vầng sáng chờ, từ lần sau hiện ngay ảnh chụp cọp đã lưu trong máy (SK), rồi 3D thay vào. */
+var SK='tg9snap1',snap=null,sty=document.createElement('style');
+sty.textContent=".gt3{position:relative;width:min(56vw,42vh,250px);aspect-ratio:5/6;margin-bottom:4px!important}.gt3:before{content:'';position:absolute;left:12%;top:18%;width:76%;height:70%;border-radius:50%;background:radial-gradient(circle,rgba(255,214,110,.5),rgba(255,214,110,0) 68%);animation:gtp 1.6s ease-in-out infinite}.gt3.snap:before,.gt3.on:before{display:none}.gt3 img,.gt3 canvas{position:absolute;left:0;top:0;width:100%;height:100%;filter:drop-shadow(0 14px 18px rgba(0,0,0,.45))}.gt3.on img{display:none}@keyframes gtp{50%{opacity:.45;transform:scale(1.08)}}@media(max-height:480px){.gt3{display:none}}@media(prefers-reduced-motion:reduce){.gt3:before{animation:none}}";
+document.head.appendChild(sty);
+var old=g.querySelector('.gt'),box=document.createElement('div');box.className='gt3';
+try{snap=localStorage.getItem(SK)}catch(e){}
+if(snap&&/^data:image\/(webp|png);base64,/.test(snap)){var im=new Image();im.alt='';im.src=snap;box.appendChild(im);box.classList.add('snap')}
 if(old)old.parentNode.replaceChild(box,old);else g.insertBefore(box,g.firstChild);
 function tiger3d(){
  var T=window.THREE,TR=window.TR,R=window.TigerRig;if(!T||!TR||!TR.ready||!R)return 0;
  var cv=document.createElement('canvas');cv.width=500;cv.height=600;box.appendChild(cv);
- var r,sc=new T.Scene(),cam=new T.PerspectiveCamera(34,5/6,.1,60),tg=TR.make(T),t0=performance.now();
+ var r,sc=new T.Scene(),cam=new T.PerspectiveCamera(34,5/6,.1,60),tg=TR.make(T),t0=performance.now(),fr=0;
  try{r=new T.WebGLRenderer({canvas:cv,alpha:true,antialias:true})}catch(e){box.removeChild(cv);return 0}
  r.setPixelRatio(1);r.setSize(500,600,false);r.setClearColor(0,0);
  sc.add(new T.HemisphereLight(0xffffff,0x8a9bd8,1.05));var dl=new T.DirectionalLight(0xffe6c0,.9);dl.position.set(3,6,8);sc.add(dl);
@@ -23,10 +27,11 @@ function tiger3d(){
   requestAnimationFrame(loop);var t=(performance.now()-t0)/1000;
   TR.apply(tg,R.solve({ph:0,k:0,t:t,wave:1,cheer:0,jump:0,air:0,lean:0,look:0}));
   if(TR.tail)TR.tail(tg,t,0,0);tg.g.position.y=Math.abs(Math.sin(t*3.2))*.1;tg.g.rotation.y=-Math.PI/2+.28+Math.sin(t*.9)*.18;
-  r.render(sc,cam)})();
+  r.render(sc,cam);
+  if(!snap&&++fr==30){try{localStorage.setItem(SK,cv.toDataURL('image/webp',.82))}catch(e){}}})();
  return 1}
-var tries=0,iv=setInterval(function(){if(!g.parentNode||++tries>160){clearInterval(iv);return}
- try{if(tiger3d())clearInterval(iv)}catch(e){clearInterval(iv)}},250);
+var tries=0,iv=setInterval(function(){if(!g.parentNode||++tries>500){clearInterval(iv);return}
+ try{if(tiger3d())clearInterval(iv)}catch(e){clearInterval(iv)}},80);
 var bt=g.querySelector('button'),pp=g.querySelector('p');if(bt)bt.remove();if(pp)pp.textContent='Chọn cửa hàng, nhập số hóa đơn rồi bấm vào đua. Cọp nào đội quà về đích trước, quà đó là của bạn';
 var f=document.createElement('div');f.className='gf';
 f.innerHTML="<label for='gs'>Cửa hàng</label><div class='gsr'><input id='gs' placeholder='Gõ tên cửa hàng để tìm' autocomplete='off'><div id='gl' hidden></div></div><label for='gh'>Số hóa đơn</label><input id='gh' placeholder='Nhập số hóa đơn' autocomplete='off'><p id='ge' class='ge'></p><button id='gb' type='button' class='gbtn'>🐯 VÀO ĐUA</button>";
