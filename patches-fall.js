@@ -41,5 +41,13 @@ function mkTab(f,c1,c2,p1,p2,WS,FT){var nz=mkPace(f);`],
 [`mid:i==(LP.length>>1)});`,`mid:i==(LP.length>>1)&&state=='intro'&&performance.now()-introT0<2300,fall:(plan&&plan.FT&&state=='race'&&plan.FT[i]!==undefined)?plan.FT[i]:-1});`],
 /* bụi tung lên đúng lúc cọp chạm đất */
 [`l.v=v;pose(l,0,v,dt,i,rt);place(l,i,n,th)});`,`l.v=v;pose(l,0,v,dt,i,rt);place(l,i,n,th);
-if(plan&&plan.FT&&state=='race'&&plan.FT[i]>=0&&!l.dz&&rt-plan.FT[i]>.5){l.dz=1;var fo=l.ln.position,fs=Math.sin(l.th),fc=Math.cos(l.th),fq;for(fq=0;fq<26;fq++)emit(PUF,fo.x+fs*(Math.random()-.5)*1.4,.3,fo.z-fc*(Math.random()-.5)*1.4,(Math.random()-.5)*4,.6+Math.random()*2.2,(Math.random()-.5)*4,.7+Math.random()*.6)}});`]
+if(plan&&plan.FT&&state=='race'&&plan.FT[i]>=0&&!l.dz&&rt-plan.FT[i]>.5){l.dz=1;var fo=l.ln.position,fs=Math.sin(l.th),fc=Math.cos(l.th),fq;for(fq=0;fq<26;fq++)emit(PUF,fo.x+fs*(Math.random()-.5)*1.4,.3,fo.z-fc*(Math.random()-.5)*1.4,(Math.random()-.5)*4,.6+Math.random()*2.2,(Math.random()-.5)*4,.7+Math.random()*.6)}});`],
+/* v17 */
+[`l.sp.visible=a>.01&&(!end||(plan&&i==plan.W))})}`,`l.sp.visible=a>.01&&(!end||(plan&&i==plan.W))});
+/* v17: GIÃN NHÃN – hiện ĐỦ mọi nhãn, nhãn chồng nhau trên màn hình thì đẩy lên (center.y) cho khỏi che nhau */
+var Wd=fw||800,Hd=fh||600,L2=[],P2=[],q2,a2,b2,sh,ok,it,t2;
+LN.forEach(function(l,i){var s=l.sp;if(!s||!s.visible)return;s.getWorldPosition(RV);RV.project(C);L2.push({s:s,i:i,x:(RV.x*.5+.5)*Wd,y:(.5-RV.y*.5)*Hd,w:px*2.9,h:px*(s.userData.hf||1)})});
+L2.sort(function(a,b){return b.y-a.y||a.i-b.i});
+L2.forEach(function(e){sh=0;for(it=0;it<14;it++){ok=1;for(q2=0;q2<P2.length;q2++){a2=P2[q2];if(Math.abs(e.x-a2.x)<(e.w+a2.w)/2&&e.y-e.h/2-sh<a2.y+a2.h/2-a2.sh&&e.y+e.h/2-sh>a2.y-a2.h/2-a2.sh){sh=e.y+e.h/2-(a2.y-a2.h/2-a2.sh)+3;ok=0}}if(ok)break}
+sh=Math.min(sh,e.h*7);e.sh=sh;P2.push(e);t2=.5-sh/e.h;b2=e.s.userData.cy===undefined?.5:e.s.userData.cy;b2+=(t2-b2)*.3;e.s.userData.cy=b2;e.s.center.set(.5,b2)})}`]
 ];
