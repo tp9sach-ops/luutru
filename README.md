@@ -1,4 +1,4 @@
-# Đua Cọp May Mắn – 9 Sạch
+# Đường Đua Quà Giáng Sinh (Đua Cọp) – 9 Sạch
 
 Game thay cho Vòng Quay: khách bấm **ĐUA CỌP**, mỗi món quà là một chú cọp vàng đội hộp quà trên đầu chạy trên đường đua. Cọp đội quà nào về đích trước thì khách nhận quà đó.
 
