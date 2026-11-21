@@ -1,11 +1,11 @@
-/* PATCHES v22 – MỤC 1: camera tự canh khung (cọp luôn nằm giữa, vừa khít, thấy đủ tên quà) + tên quà to rõ. MỤC 4: nhịp đua hồi hộp, vượt mặt tự nhiên. MỤC 5: quà hết (0%) vẫn có cọp trên đường đua nhưng không bao giờ trúng.
+/* PATCHES v22 – MỤC 1: camera tự canh khung (cọp luôn nằm giữa, vừa khít, thấy đủ tên quà) + tên quà to rõ. MỤC 4: nhịp đua hồi hộp, vượt mặt tự nhiên. MỤC 5: quà hết (0%) vẫn có cọp trên đường đua nhưng không bao giờ trúng. MỤC 6: hình quà hiện phía trên bảng tên quà.
    Áp bằng find-and-replace lên game.js SAU các vá P của loader.js. Thêm mục mới: chỉ cần thêm cặp [tìm, thay] vào cuối mảng. */
 window.P22=[
-/* 1. hàm canh khung: tính vị trí từng cọp (theo tiến độ đua), căn tâm theo khung nhìn rồi lùi camera đúng bằng khoảng cần để mọi cọp + tên quà lọt khung */
+/* 1. hàm canh khung: tính vị trí từng cọp (theo tiến độ đua), căn tâm theo khung nhìn rồi lùi camera đúng bằng khoảng cần để mọi cọp + tên quà (+ hình quà nếu có) lọt khung */
 [`function cam(now,dt){`,`var FZ=null;
 function fitCam(t,asp){
 var m=LN.length,rc=plan&&(state=='race'||state=='done'),PX=[],PZ=[],q,j,tq,rq,o,cx=0,cz=0,
-tv=Math.tan(baseFov*Math.PI/360),th=tv*asp,el=.56,ph=asp<1?.75:.42,YS=[0,5.2,9.2],
+tv=Math.tan(baseFov*Math.PI/360),th=tv*asp,el=.56,ph=asp<1?.75:.42,YS=[0,5.2,(LN.some(function(l){return l.sp&&l.sp.userData&&l.sp.userData.hf})?12.8:9.2)],
 a,ux,uz,ce=Math.cos(el),se=Math.sin(el),fx,fy,fz,rx,rz,rl,cux,cuy,cuz,
 xmn=1e9,xmx=-1e9,ymn=1e9,ymx=-1e9,sx,sy,D=14,dx,dz,dy,xr,yu,zf,P=[];
 for(q=0;q<m;q++){
@@ -45,5 +45,22 @@ function cam(now,dt){`],
 [`tab.push(mkTab(fi,.05+Math.random()*.04,.11+Math.random()*.06,Math.random()*TWO,Math.random()*TWO))}`,`tab.push(mkTab(fi,.05+Math.random()*.04,.11+Math.random()*.06,Math.random()*TWO,Math.random()*TWO,i==wi?.22+Math.random()*.2:0))}`],
 /* MỤC 5 – quà hết (0%) vẫn xuất hiện trên đường đua. Máy chủ gửi thêm D.show[cửa hàng] = mọi quà đang bật (kể cả hết kho / tỷ lệ 0%); D.prizes[cửa hàng] vẫn chỉ gồm quà còn quay được
    (dùng để kiểm tra cửa hàng hết quà và để khách chỉ trúng quà còn kho). Cửa hàng không còn quà nào quay được thì giữ nguyên hành vi cũ (báo hết quà). Máy chủ cũ không có D.show thì dùng danh sách cũ. */
-[`P=(D&&D.prizes[ST])||[];LP=P.slice(0,MAXL);buildScene();`,`P=(D&&D.prizes[ST])||[];LP=(P.length&&D.show&&D.show[ST]&&D.show[ST].length?D.show[ST]:P).slice(0,MAXL);buildScene();`]
+[`P=(D&&D.prizes[ST])||[];LP=P.slice(0,MAXL);buildScene();`,`P=(D&&D.prizes[ST])||[];LP=(P.length&&D.show&&D.show[ST]&&D.show[ST].length?D.show[ST]:P).slice(0,MAXL);buildScene();`],
+/* MỤC 6 – hình quà hiện phía TRÊN bảng tên quà. labelI() dựng sprite cao hơn: bảng tên giữ nguyên ở dưới, khung hình quà (viền vàng, nền kem) ở trên, ảnh lấy từ IM[tên quà] (ảnh quản trị tải lên tab AnhQua).
+   Quà chưa có ảnh thì vẫn là bảng tên như cũ. relab() nhân chiều cao sprite theo sp.userData.hf để bảng tên không đổi cỡ. */
+[`function label(txt,col,w,h){`,`function labelI(txt,col,w,h,src){
+var sp=label(txt,col,w,h);if(!src)return sp;
+var pl=sp.material.map.image,c=document.createElement('canvas'),W=320,H=300,x=c.getContext('2d'),im=new Image(),tx=new TH.CanvasTexture(c),bx=40,by=6,bw=240,bh=176,r=26;
+c.width=W;c.height=H;
+function rr(){x.beginPath();x.moveTo(bx+r,by);x.arcTo(bx+bw,by,bx+bw,by+bh,r);x.arcTo(bx+bw,by+bh,bx,by+bh,r);x.arcTo(bx,by+bh,bx,by,r);x.arcTo(bx,by,bx+bw,by,r);x.closePath()}
+function dr(g){x.clearRect(0,0,W,H);x.drawImage(pl,0,190,W,110);
+if(g){var s=Math.min((bw-20)/g.width,(bh-20)/g.height);
+x.save();rr();x.fillStyle='#fffaf0';x.fill();x.clip();x.drawImage(g,bx+(bw-g.width*s)/2,by+(bh-g.height*s)/2,g.width*s,g.height*s);x.restore();
+rr();x.lineWidth=8;x.strokeStyle='#ffd05a';x.stroke()}}
+dr(0);tx.needsUpdate=true;
+sp.material.map.dispose();sp.material.map=tx;sp.material.needsUpdate=true;sp.userData.hf=H/110;
+im.onload=function(){try{dr(im);tx.needsUpdate=true}catch(e){}};im.src=src;return sp}
+function label(txt,col,w,h){`],
+[`var sp=label(p.ten,col,2.9,1);`,`var sp=labelI(p.ten,col,2.9,1,IM[p.ten]);`],
+[`l.sp.scale.set(Math.max(h*2.9,.0001),Math.max(h,.0001),1);`,`l.sp.scale.set(Math.max(h*2.9,.0001),Math.max(h*(l.sp.userData.hf||1),.0001),1);`]
 ];
