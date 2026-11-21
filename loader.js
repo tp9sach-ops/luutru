@@ -1,4 +1,4 @@
-/* LOADER v15 (cọp dựng lại theo ảnh mẫu 9 Sạch) – nạp game.js rồi áp bản vá (find-and-replace) trước khi chạy. Vá không khớp bị bỏ qua. ?debug=1 hiển số vá áp được/hụt. ?classic=1 -> bản gốc. */
+/* LOADER v16 (cọp 3D CÓ XƯƠNG THẬT từ mô hình của chủ game; tiger/ chứa lưới, xương, trọng số, chuyển động; hỏng thì tự quay về cọp dựng bằng mã v15) – nạp game.js rồi áp bản vá (find-and-replace) trước khi chạy. Vá không khớp bị bỏ qua. ?debug=1 hiển số vá áp được/hụt. ?classic=1 -> bản gốc. */
 (function(){
 var V='game.js?v=13';
 function run(s){var e=document.createElement('script');e.text=s;document.body.appendChild(e)}
@@ -168,9 +168,19 @@ x.restore()}
 [`if(!LOGOC)return;var x=LOGOC.getContext('2d');x.clearRect(0,0,128,128);`,`if(!LOGOC)return;var x=LOGOC.getContext('2d');x.clearRect(0,0,256,256);try{drawLogo9(x);if(TX.logo)TX.logo.needsUpdate=true;return}catch(e){x.setTransform(2,0,0,2,0,0)}`],
 [`var sg=label('9 SẠCH',0xd8132f,2.5,1.05);sg.position.set(-7,3.4,zf-2.05);`,`var sg=new TH.Sprite(new TH.SpriteMaterial({map:TX.logo,transparent:true}));sg.scale.set(2.2,2.2,1);sg.position.set(-7,3.9,zf-2.05);`],
 [`var bn=label('9 SẠCH',0xd8132f,5.6,2);bn.position.set(FIN+1.2,10.4,0);world.add(bn);`,`var bn=new TH.Sprite(new TH.SpriteMaterial({map:TX.logo,transparent:true}));bn.scale.set(4.4,4.4,1);bn.position.set(FIN+1.2,10.6,0);world.add(bn);`],
-[`st.position.set(3.4,6.9,0);world.add(st);`,`st.position.set(3.4,6.9,0);world.add(st);var sl=new TH.Sprite(new TH.SpriteMaterial({map:TX.logo,transparent:true}));sl.scale.set(3,3,1);sl.position.set(3.4,9.4,0);world.add(sl);`]
+[`st.position.set(3.4,6.9,0);world.add(st);`,`st.position.set(3.4,6.9,0);world.add(st);var sl=new TH.Sprite(new TH.SpriteMaterial({map:TX.logo,transparent:true}));sl.scale.set(3,3,1);sl.position.set(3.4,9.4,0);world.add(sl);`],
+/* v16: CỌP CÓ XƯƠNG THẬT. Nếu nạp được tiger/ thì dùng SkinnedMesh + chuyển động chạy/đứng/vẫy/ăn mừng (tiger/tiger-runtime.js), không thì giữ cọp v15 */
+[`function tiger(col){
+  var YL=0xf9cb1c,`,`function tiger(col){var _r=window.TR&&TR.ready&&TR.make(TH,col);if(_r)return _r;
+  var YL=0xf9cb1c,`],
+[`function pose(l,x,v,dt,i,rt){`,`function pose(l,x,v,dt,i,rt){if(l.tg&&l.tg.rig)return TR.pose(l,x,v,dt,i,rt,{state:state,tm:tm,win:(plan&&i==plan.W&&rt>DUR)?rt-DUR:-1,mid:i==(LP.length>>1)});`],
+[`gb.scale.setScalar(.85);`,`gb.scale.setScalar(tg.rig?1.05:.85);`],
+[`tg.g.scale.setScalar(1.18);`,`tg.g.scale.setScalar(tg.rig?1.1:1.18);`]
 ];
-fetch(V).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(s){
+function loadJS(u){return new Promise(function(ok,bad){var e=document.createElement('script');e.src=u;e.onload=ok;e.onerror=function(){bad(new Error(u))};document.head.appendChild(e)})}
+/* cọp có xương: nạp song song với game.js; lỗi thì bỏ qua (game dùng cọp dựng bằng mã) */
+var tgr=loadJS('tiger/tiger-rig.js?v=1').then(function(){return loadJS('tiger/tiger-runtime.js?v=1')}).then(function(){return window.TR.load('tiger/')}).catch(function(e){try{console.warn('Cọp có xương chưa nạp được, dùng cọp dựng bằng mã',e)}catch(_){}});
+Promise.all([fetch(V).then(function(r){if(!r.ok)throw 0;return r.text()}),tgr]).then(function(a){var s=a[0];
  var ok=0,miss=[];
  P.forEach(function(q){if(s.indexOf(q[0])<0){miss.push(q[0].slice(0,28));return}ok++;s=s.split(q[0]).join(q[1])});
  if(/[?&]debug=1/.test(location.search)){var d=document.createElement('div');d.style.cssText='position:fixed;left:6px;top:6px;z-index:99999;background:#000c;color:#0f0;font:11px monospace;padding:6px;max-width:90vw;pointer-events:none';d.textContent='patch '+ok+'/'+P.length+(miss.length?' MISS: '+miss.join(' | '):'');document.body.appendChild(d)}
