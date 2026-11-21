@@ -9,7 +9,8 @@ window.TIGER_FALL = {
 };
 /* NHỊP ĐUA (v16): tốc độ mỗi cọp = nhiễu mượt ngẫu nhiên (mỗi cọp một nhịp riêng, không tuần hoàn) + vài cú bứt ngắn, có giới hạn độ dốc.
    amp = biên độ nhiễu (phần của tốc độ TB, 0.22 ≈ dao động hiệu dụng ~10%); burst = biên độ cú bứt; nb = số cú bứt tối đa/cọp/ván; kmin,kmax = khoảng cách nút nhiễu (giây, lớn = chậm/êm);
-   amax = độ dốc tối đa của hệ số tốc độ (đơn vị: tốc độ TB mỗi giây); win = lợi thế tốc độ tăng dần tới giây 8 của cọp trúng quà (ĐỂ 0: đặt dương làm cọp trúng quà tụt đầu đua do mkTab chuẩn hóa quãng đường); spr = hệ số nhân cú nước rút cuối của cọp trúng quà (nhỏ = ít tụt giữa chặng). */
+   amax = độ dốc tối đa của hệ số tốc độ (đơn vị: tốc độ TB mỗi giây); win = lợi thế tốc độ tăng dần tới giây 8 của cọp trúng quà (ĐỂ 0: đặt dương làm cọp trúng quà tụt đầu đua do mkTab chuẩn hóa quãng đường); spr = hệ số nhân cú nước rút cuối của cọp trúng quà (nhỏ = ít tụt giữa chặng).
+   LƯU Ý TÊN BIẾN: trong game.js đã có biến PC (các hộp hạt) nên cấu hình nhịp trong game tên là TPC, KHÔNG đặt PC. */
 window.TIGER_PACE = { amp: .22, burst: .18, nb: 3, kmin: 1.1, kmax: 2.6, amax: .5, win: 0, spr: .3 };
 window.P23=[
 /* hệ số tốc độ khi té: chậm dần lúc vấp, gần đứng yên lúc nằm, tăng lại khi đứng dậy */
@@ -23,17 +24,17 @@ c.sort(function(){return Math.random()-.5});
 tm1=C.tMin==null?3.5:C.tMin;tmax=DUR-(C.tEndGuard==null?8.5:C.tEndGuard);
 c.forEach(function(i){if(cnt>=(C.maxFalls==null?2:C.maxFalls))return;o[i]=tm1+Math.random()*Math.max(0,tmax-tm1);cnt++});
 return o}
-var PC=window.TIGER_PACE||{amp:.22,burst:.18,nb:3,kmin:1.1,kmax:2.6,amax:.5,win:0,spr:.3};
-function mkPace(f){var dt=1/60,N=Math.ceil(f/dt)+3,A=new Float32Array(N),i,t,k0,k1,x,r=[],tt=-Math.random()*PC.kmax,nbr,b,bt,bw,ba,u,v,prev,lim=PC.amax*dt;
-while(tt<f+PC.kmax){r.push([tt,Math.random()*2-1]);tt+=PC.kmin+Math.random()*(PC.kmax-PC.kmin)}
-k0=0;for(i=0;i<N;i++){t=i*dt;while(k0<r.length-2&&r[k0+1][0]<=t)k0++;k1=k0+1;x=(t-r[k0][0])/(r[k1][0]-r[k0][0]);x=x*x*(3-2*x);A[i]=PC.amp*(r[k0][1]+(r[k1][1]-r[k0][1])*x)}
-nbr=Math.floor(Math.random()*(PC.nb+1));
-for(b=0;b<nbr;b++){bt=3+Math.random()*Math.max(.5,f-9);bw=.45+Math.random()*.4;ba=PC.burst*(.6+Math.random()*.8);
+var TPC=window.TIGER_PACE||{amp:.22,burst:.18,nb:3,kmin:1.1,kmax:2.6,amax:.5,win:0,spr:.3};
+function mkPace(f){var dt=1/60,N=Math.ceil(f/dt)+3,A=new Float32Array(N),i,t,k0,k1,x,r=[],tt=-Math.random()*TPC.kmax,nbr,b,bt,bw,ba,u,v,prev,lim=TPC.amax*dt;
+while(tt<f+TPC.kmax){r.push([tt,Math.random()*2-1]);tt+=TPC.kmin+Math.random()*(TPC.kmax-TPC.kmin)}
+k0=0;for(i=0;i<N;i++){t=i*dt;while(k0<r.length-2&&r[k0+1][0]<=t)k0++;k1=k0+1;x=(t-r[k0][0])/(r[k1][0]-r[k0][0]);x=x*x*(3-2*x);A[i]=TPC.amp*(r[k0][1]+(r[k1][1]-r[k0][1])*x)}
+nbr=Math.floor(Math.random()*(TPC.nb+1));
+for(b=0;b<nbr;b++){bt=3+Math.random()*Math.max(.5,f-9);bw=.45+Math.random()*.4;ba=TPC.burst*(.6+Math.random()*.8);
 for(i=0;i<N;i++){t=i*dt;u=(t-bt)/bw;if(u>0&&u<1){v=Math.sin(Math.PI*u);A[i]+=ba*v*v}else if(u>=1&&u<3.2){v=Math.sin(Math.PI*(u-1)/2.2);A[i]-=ba*.3*v*v}}}
 prev=0;for(i=0;i<N;i++){x=A[i]-prev;if(x>lim)x=lim;else if(x<-lim)x=-lim;prev+=x;A[i]=prev}
 return function(t){var q=t/dt,k=q|0;if(k<0)return 0;if(k>=N-1)return A[N-1];return A[k]+(A[k+1]-A[k])*(q-k)}}
 function mkTab(f,c1,c2,p1,p2,WS,FT){var nz=mkPace(f);`],
-[`m=1+g0*(.36*Math.sin(TWO*c1*3.2*t+p1)+.2*Math.sin(TWO*c2*2.2*t+p2)+.12*Math.sin(TWO*(c1+c2)*1.7*t+p1-p2));return e*m*(1+(WS||0)*sw)}`,`m=1+g0*nz(t);return e*m*(1+(WS||0)*sw*PC.spr+(WS?PC.win*Math.min(1,t/8):0))*fallSpd(t,FT===undefined?-1:FT)}`],
+[`m=1+g0*(.36*Math.sin(TWO*c1*3.2*t+p1)+.2*Math.sin(TWO*c2*2.2*t+p2)+.12*Math.sin(TWO*(c1+c2)*1.7*t+p1-p2));return e*m*(1+(WS||0)*sw)}`,`m=1+g0*nz(t);return e*m*(1+(WS||0)*sw*TPC.spr+(WS?TPC.win*Math.min(1,t/8):0))*fallSpd(t,FT===undefined?-1:FT)}`],
 [`var f=[],tab=[],mx=DUR;`,`var f=[],tab=[],mx=DUR,FT=pickFalls(LP.length,wi);LN.forEach(function(l){l.dz=0});`],
 [`Math.random()*TWO,Math.random()*TWO,i==wi?.22+Math.random()*.2:0))}`,`Math.random()*TWO,Math.random()*TWO,i==wi?.22+Math.random()*.2:0,FT[i]))}`],
 [`plan={W:wi,f:f,tab:tab,mx:mx,t0:performance.now(),r:r,win:0};`,`plan={W:wi,f:f,tab:tab,mx:mx,t0:performance.now(),r:r,win:0,FT:FT};`],
