@@ -1,4 +1,4 @@
-/* PATCHES v22 – MỤC 1: camera tự canh khung (cọp luôn nằm giữa, vừa khít, thấy đủ tên quà) + tên quà to rõ. MỤC 4: nhịp đua hồi hộp, vượt mặt tự nhiên. MỤC 5: quà hết (0%) vẫn có cọp trên đường đua nhưng không bao giờ trúng. MỤC 6: hình quà hiện phía trên bảng tên quà (v2: ô vuông nhỏ). MỤC 7: nhãn "Hóa đơn từ 155k". MỤC 8: xuất phát chạy luôn (tốc độ vào đà ngay, không đứng đơ rồi bị kéo); tư thế sẵn sàng nằm ở tiger/tiger-runtime.js. MỤC 9: cọp to hơn, hình quà nhỏ, logo đích nâng cao, nhạc đua không ngắt khi về đích. MỤC 10: thêm nhiều vật phẩm ĐỎ Noel vào cảnh đua (không đổi nền).
+/* PATCHES v22 – MỤC 1: camera tự canh khung (cọp luôn nằm giữa, vừa khít, thấy đủ tên quà) + tên quà to rõ. MỤC 4: nhịp đua hồi hộp, vượt mặt tự nhiên. MỤC 5: quà hết (0%) vẫn có cọp trên đường đua nhưng không bao giờ trúng. MỤC 6: hình quà hiện phía trên bảng tên quà (v2: ô vuông nhỏ). MỤC 7: nhãn "Hóa đơn từ 155k". MỤC 8: xuất phát chạy luôn (tốc độ vào đà ngay, không đứng đơ rồi bị kéo); tư thế sẵn sàng nằm ở tiger/tiger-runtime.js. MỤC 9: cọp to hơn, hình quà nhỏ, logo đích nâng cao, nhạc đua không ngắt khi về đích. MỤC 10: thêm nhiều vật phẩm ĐỎ Noel vào cảnh đua (không đổi nền). MỤC 11: sửa logo bị cắt còn 1/4 (canvas logo bị phóng 2x), tên quà nhỏ lại, camera ôm sát cọp.
    Áp bằng find-and-replace lên game.js SAU các vá P của loader.js. Thêm mục mới: chỉ cần thêm cặp [tìm, thay] vào cuối mảng. */
 window.P22=[
 /* 1. hàm canh khung: tính vị trí từng cọp (theo tiến độ đua), căn tâm theo khung nhìn rồi lùi camera đúng bằng khoảng cần để mọi cọp + tên quà (+ hình quà nếu có) lọt khung */
@@ -79,5 +79,12 @@ function label(txt,col,w,h){`],
 [`var ORN=[0xd8132f,0xffd54a,0x2f6fd8,0xffffff]`,`var ORN=[0xd8132f,0xd8132f,0xffd54a,0xd8132f,0xffffff]`],
 [`var BUL=[0xff3b3b,0xffd54a,0x4fc3f7,0x7cfc8a,0xff8ad8]`,`var BUL=[0xff3b3b,0xffd54a,0xff3b3b,0xffffff,0xff3b3b]`],
 [`for(k=0;k<12;k++){a=k*TWO/12+.4;r=Ro+3.8+(k%2)*1.6;bgift(`,`for(k=0;k<20;k++){a=k*TWO/20+.4;r=Ro+3.8+(k%2)*1.6;bgift(`],
-[`k%2?0x1f8f55:0xd32f2f,k%2?0xffffff:0xffd54a,k)}`,`k%3?0xd32f2f:0xffffff,k%3?0xffd54a:0xd32f2f,k)}`]
+[`k%2?0x1f8f55:0xd32f2f,k%2?0xffffff:0xffd54a,k)}`,`k%3?0xd32f2f:0xffffff,k%3?0xffd54a:0xd32f2f,k)}`],
+/* MỤC 11 – (a) LỖI LOGO: drawLogo() có nhánh vẽ dự phòng gọi x.setTransform(2,0,0,2,0,0) khi ảnh logo chưa tải; phép phóng 2x này KHÔNG được đặt lại nên các lần vẽ sau (ảnh tải xong / font tải xong) vẽ ảnh to gấp đôi, canvas 256 chỉ còn 1/4 góc trên trái của logo
+   (đúng như ảnh chụp: biển đích và huy hiệu bị cắt thành 1/4). Sửa: đặt lại ma trận về đơn vị trước mỗi lần vẽ.
+   (b) tên quà nhỏ lại (cao ~3.8% màn hình thay vì 7%, tối đa ~40px) để cọp là trọng tâm; (c) camera ôm sát hơn: góc nhìn dọc màn hình hẹp (ph .75 -> .5, hàng cọp xuôi hướng nhìn hơn nên hẹp lại), ngang .42 -> .35; chừa chiều cao nhãn thấp hơn. */
+[`var x=LOGOC.getContext('2d');x.clearRect(0,0,256,256);`,`var x=LOGOC.getContext('2d');x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,256,256);`],
+[`px=Math.min(Math.max(38,Math.min(68,H*.07)),Math.max(34,(fw||800)*(LN.length>6?.1:.14)))`,`px=Math.min(Math.max(24,Math.min(40,H*.038)),Math.max(22,(fw||800)*(LN.length>6?.065:.09)))`],
+[`ph=asp<1?.75:.42`,`ph=asp<1?.5:.35`],
+[`?10.6:9.2)]`,`?9:7.6)]`]
 ];
