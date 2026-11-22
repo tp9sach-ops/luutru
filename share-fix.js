@@ -1,5 +1,35 @@
-/* v32: Tắt đăng nhập Facebook (CFG.FB_APP_ID rỗng) -> khách nhập SĐT nhận quà rồi bấm chia sẻ. Lý do: game nhúng trong khung Google Sites (iframe) nên Facebook bị chặn khi chuyển trang/cửa sổ bật lên; bản GitHub thì app Facebook báo "Sự cố tải". Bật lại: xoá dòng ngay dưới. */
-try{window.CFG.FB_APP_ID=''}catch(e){}
+/* v33: Đăng nhập Facebook bằng CỬA SỔ BẬT LÊN (FB.login) thay cho chuyển trang. Lý do: game nhúng trong khung (iframe) Google Sites, Facebook cấm hiện trang đăng nhập BÊN TRONG khung nhưng vẫn cho mở ở cửa sổ riêng. Thất bại/bị chặn -> tự về nhập SĐT. Quay về bản v32 (chỉ SĐT): thêm lại dòng try{window.CFG.FB_APP_ID=''}catch(e){} ngay dưới đây. */
+(function(){
+var fbErr='';
+function loadSDK(){
+ if(window.FB&&window.__fbInit)return;
+ if(document.getElementById('fb-sdk'))return;
+ window.fbAsyncInit=function(){try{window.FB.init({appId:window.CFG.FB_APP_ID,version:'v19.0',cookie:false,xfbml:false});window.__fbInit=1}catch(e){fbErr='init'}};
+ var s=document.createElement('script');s.id='fb-sdk';s.async=true;s.src='https://connect.facebook.net/vi_VN/sdk.js';s.onerror=function(){fbErr='load'};document.head.appendChild(s)}
+var orig=window.DCclaim;
+if(typeof orig==='function'&&!orig.__v33){
+ window.DCclaim=function(r,hd,tk,em){
+  var res=orig.apply(this,arguments);
+  try{
+   if(tk||!(window.CFG&&window.CFG.FB_APP_ID))return res;
+   var cb=document.getElementById('cb');
+   if(!cb||!/FACEBOOK/i.test(cb.textContent))return res;
+   loadSDK();
+   cb.onclick=function(){
+    var e=document.getElementById('ce');
+    if(fbErr){e.textContent='Không tải được Facebook trên máy này. Hãy nhập số điện thoại để nhận quà.';return}
+    if(!window.__fbInit||!window.FB){e.textContent='Đang kết nối Facebook, vui lòng bấm lại sau 2-3 giây';loadSDK();return}
+    e.textContent='';cb.disabled=true;var t0=cb.textContent;cb.textContent='⏳ Đang mở Facebook…';
+    var done=0,rs=function(m){if(done)return;done=1;cb.disabled=false;cb.textContent=t0;if(m)e.textContent=m};
+    var to=setTimeout(function(){rs('Facebook chưa phản hồi. Bấm thử lại hoặc nhập số điện thoại.')},90000);
+    try{window.FB.login(function(x){clearTimeout(to);var a=x&&x.authResponse;
+     if(a&&a.accessToken){done=1;window.DCclaim(r,hd,a.accessToken,'')}
+     else rs('Chưa đăng nhập được Facebook (bạn đã hủy hoặc cửa sổ bị chặn). Bấm thử lại hoặc nhập số điện thoại.')},{scope:'public_profile'})}
+    catch(x){clearTimeout(to);rs('Không mở được cửa sổ Facebook. Hãy nhập số điện thoại để nhận quà.')}}
+  }catch(x){}
+  return res};
+ window.DCclaim.__v33=1}
+})();
 /* nút CHIA SẺ LÊN FACEBOOK: chỉ sao chép nội dung + liên kết mở Facebook (tab mới), không tự tải ảnh/mở tab. */
 (function(){var rs=document.getElementById('rs');if(!rs)return;
 function fix(){var sb=document.getElementById('sb');if(!sb||sb.__fx)return;sb.__fx=1;
