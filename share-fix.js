@@ -1,5 +1,4 @@
-/* v35: Trong khung nhúng (Google Sites) trình duyệt chặn cửa sổ bật lên ngay lập tức (FB.login trả "unknown" sau 1ms) -> đăng nhập Facebook không thể chạy trong khung. Khi game chạy trong khung: tắt FB, khách nhập SĐT; khi mở toàn trang (link GitHub / tên miền riêng): vẫn đăng nhập Facebook bằng cửa sổ bật lên. */
-try{if(window.self!==window.top)window.CFG.FB_APP_ID=''}catch(e){}
+/* v36: BỎ việc tắt Facebook trong khung (v35 sai: ảnh chụp 14:02 cho thấy cửa sổ Facebook vẫn mở được từ khung Google Sites; lỗi thật là "Miền chủ JSSDK không xác định" -> phải thêm miền vào "Allowed Domains for the JavaScript SDK" của app Facebook). Muốn tắt FB: thêm dòng try{window.CFG.FB_APP_ID=''}catch(e){} ngay dưới. */
 /* v34: (1) Máy chủ đang chạy bản cũ đòi họ tên khi nhận quà bằng SĐT -> bọc window.api: lệnh claim không có tên/Facebook thì tự thêm ten='Khách <4 số cuối>'. (2) Báo thêm mã chẩn đoán khi FB.login thất bại. */
 (function(){var a0=window.api;if(typeof a0==='function'&&!a0.__v34){window.api=function(a,d){if(a==='claim'&&d&&!d.fbt&&!d.ten&&d.sdt)d=Object.assign({},d,{ten:'Khách '+String(d.sdt).slice(-4)});return a0.call(this,a,d)};window.api.__v34=1}})();
 /* v33: Đăng nhập Facebook bằng CỬA SỔ BẬT LÊN (FB.login) thay cho chuyển trang. Thất bại/bị chặn -> về nhập SĐT. */
