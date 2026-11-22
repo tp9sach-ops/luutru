@@ -27,7 +27,6 @@ if(FA&&window.TR&&TR.ready){FA.build(TH);FA.groups=[];
 var p=WL(thF,0,0,0),R2=W/2+.6,t;bpush(p[0],0,p[2],1,Math.PI/2-thF);
 for(k=0;k<=30;k++){t=k/30*Math.PI;bs(k%2?0xffd54a:0xd8132f,.27,.27,.27,.3,8.8+Math.sin(t)*R2*.3,Math.cos(t)*R2);if(k%2==0)bulbI(.6,9.1+Math.sin(t)*R2*.3,Math.cos(t)*R2,.14,BUL[k%5])}
 bpop();
-[-1,1].forEach(function(q,m){var g=WL(thF,q*(W/2+3.6),0,0);bgift(g[0],0,g[2],1.7,0xd32f2f,0xffd54a,m);bgift(g[0],1.7,g[2],1.1,0xffffff,0xd32f2f,m+3)});
 var bm2=function(th,lx,lean){var g=WL(th,lx,0,0),G=new TH.Group(),c=new TH.Mesh(new TH.ConeGeometry(3,70,14,1,true).translate(0,-35,0),new TH.MeshBasicMaterial({color:0xfff0c0,transparent:true,opacity:.09,blending:TH.AdditiveBlending,depthWrite:false,side:TH.DoubleSide,fog:false}));c.rotation.x=Math.PI;G.add(c);G.position.set(g[0],0,g[2]);G.rotation.z=lean;G.rotation.x=lean*.6;world.add(G);glowS(TX.glowW,7,7,g[0],.4,g[2],.7)};
 [[-1,-.22],[1,.22],[-1.5,-.3],[1.5,.3]].forEach(function(q){bm2(thF,q[0]*(W/2+6),q[1])});
 [-.5,-.25,.25,.5].forEach(function(d){var g=WL(thF+d,0,0,Ro-RM+6);bm2(thF+d,Ro-RM+6,d>0?-.18:.18)});
@@ -42,5 +41,7 @@ x.strokeStyle='#ffd54a';x.lineWidth=.16*u;[RI+.62,Ro-.62].forEach(function(rr){x
 [`m.userData.trk=1;world.add(m)}`,`m.userData.trk=1;world.add(m);
 var apr=function(r0,r1,col,em){var mm=new TH.Mesh(new TH.RingGeometry(r0,r1,128,1),new TH.MeshStandardMaterial({color:col,roughness:.9,emissive:col,emissiveIntensity:em}));mm.rotation.x=-Math.PI/2;mm.position.y=.04;world.add(mm)};
 apr(Ro+.3,Ro+3.7,0x1f5e45,.16);apr(Ro+3.7,Ro+3.95,0xffd54a,.5);apr(Math.max(2,RI-3.6),RI-.3,0x1f5e45,.16);apr(RI-3.85,RI-3.6,0xffd54a,.5)}`],
-[`function bulbTick(){`,`function bulbTick(){if(window.FANS)FANS.tick(tm);`]
+[`function bulbTick(){`,`function bulbTick(){if(window.FANS)FANS.tick(tm);`],
+/* bỏ hộp quà quanh đường đua (vòng 20 hộp ngoài thảm xanh) – patches.js đã đổi 12 -> 20 nên khớp theo chuỗi sau vá đó */
+[`for(k=0;k<20;k++){a=k*TWO/20+.4;r=Ro+3.8+(k%2)*1.6;bgift(`,`for(k=0;k<0;k++){a=k*TWO/20+.4;r=Ro+3.8+(k%2)*1.6;bgift(`]
 ];
