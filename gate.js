@@ -150,14 +150,17 @@ window.DCclaim=function(r,hd){
   var L='📣 ĐĂNG NHẬP FACEBOOK & CHIA SẺ';
   head("<p>Đăng nhập Facebook để nhận quà và chia sẻ khoảnh khắc về nhất</p><p id='ce' class='ge'></p><button id='cb' class='btn' type='button' style='background:#1877f2;color:#fff'>"+L+"</button><p style='margin-top:10px'><a href='#' id='cs' style='color:#7a0a1c;font-weight:700'>Không dùng Facebook? Nhập số điện thoại</a></p>");
   $('cs').onclick=function(ev){ev.preventDefault();phoneForm()};
-  $('cb').onclick=function(){var btn=$('cb');btn.disabled=true;btn.textContent='⏳ Đang mở Facebook…';$('ce').textContent='';
-   loadFB().then(function(FB){FB.login(function(res){
-    if(!res||!res.authResponse){$('ce').textContent='Bạn chưa đăng nhập Facebook';btn.disabled=false;btn.textContent=L;return}
+  loadFB().catch(function(){});
+  $('cb').onclick=function(){var btn=$('cb');
+   if(!window.FB||!window.__fbInit){$('ce').textContent='Đang tải Facebook, vui lòng bấm lại sau 1-2 giây';loadFB().catch(function(){phoneForm('Không mở được Facebook, vui lòng nhập số điện thoại để nhận quà')});return}
+   btn.disabled=true;btn.textContent='⏳ Đang mở Facebook…';$('ce').textContent='';
+   window.FB.login(function(res){
+    if(!res||!res.authResponse){$('ce').textContent='Chưa đăng nhập được Facebook (nếu cửa sổ bị chặn, hãy cho phép cửa sổ bật lên rồi bấm lại)';btn.disabled=false;btn.textContent=L;return}
     btn.textContent='⏳ Đang ghi nhận…';
     window.api('claim',{fbt:res.authResponse.accessToken,hd:hd,tok:r.tok}).then(fin2).catch(function(x){
      if(/Facebook/.test(x.message)){phoneForm('Đăng nhập Facebook chưa được, vui lòng nhập số điện thoại để nhận quà');return}
      fail(x,btn,L)})
-   },{scope:'public_profile'})}).catch(function(){phoneForm('Không mở được Facebook, vui lòng nhập số điện thoại để nhận quà')})};
+   },{scope:'public_profile'})};
   return}
  phoneForm()};
 })();
