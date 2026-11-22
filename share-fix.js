@@ -1,3 +1,5 @@
+/* v34: (1) Máy chủ đang chạy bản cũ đòi họ tên khi nhận quà bằng SĐT -> bọc window.api: lệnh claim không có tên/Facebook thì tự thêm ten='Khách <4 số cuối>'. (2) Báo thêm mã chẩn đoán khi FB.login thất bại. */
+(function(){var a0=window.api;if(typeof a0==='function'&&!a0.__v34){window.api=function(a,d){if(a==='claim'&&d&&!d.fbt&&!d.ten&&d.sdt)d=Object.assign({},d,{ten:'Khách '+String(d.sdt).slice(-4)});return a0.call(this,a,d)};window.api.__v34=1}})();
 /* v33: Đăng nhập Facebook bằng CỬA SỔ BẬT LÊN (FB.login) thay cho chuyển trang. Lý do: game nhúng trong khung (iframe) Google Sites, Facebook cấm hiện trang đăng nhập BÊN TRONG khung nhưng vẫn cho mở ở cửa sổ riêng. Thất bại/bị chặn -> tự về nhập SĐT. Quay về bản v32 (chỉ SĐT): thêm lại dòng try{window.CFG.FB_APP_ID=''}catch(e){} ngay dưới đây. */
 (function(){
 var fbErr='';
@@ -17,15 +19,16 @@ if(typeof orig==='function'&&!orig.__v33){
    loadSDK();
    cb.onclick=function(){
     var e=document.getElementById('ce');
-    if(fbErr){e.textContent='Không tải được Facebook trên máy này. Hãy nhập số điện thoại để nhận quà.';return}
+    if(fbErr){e.textContent='Không tải được Facebook trên máy này (mã: '+fbErr+'). Hãy nhập số điện thoại để nhận quà.';return}
     if(!window.__fbInit||!window.FB){e.textContent='Đang kết nối Facebook, vui lòng bấm lại sau 2-3 giây';loadSDK();return}
     e.textContent='';cb.disabled=true;var t0=cb.textContent;cb.textContent='⏳ Đang mở Facebook…';
     var done=0,rs=function(m){if(done)return;done=1;cb.disabled=false;cb.textContent=t0;if(m)e.textContent=m};
     var to=setTimeout(function(){rs('Facebook chưa phản hồi. Bấm thử lại hoặc nhập số điện thoại.')},90000);
+    var t1=Date.now();
     try{window.FB.login(function(x){clearTimeout(to);var a=x&&x.authResponse;
      if(a&&a.accessToken){done=1;window.DCclaim(r,hd,a.accessToken,'')}
-     else rs('Chưa đăng nhập được Facebook (bạn đã hủy hoặc cửa sổ bị chặn). Bấm thử lại hoặc nhập số điện thoại.')},{scope:'public_profile'})}
-    catch(x){clearTimeout(to);rs('Không mở được cửa sổ Facebook. Hãy nhập số điện thoại để nhận quà.')}}
+     else rs('Chưa đăng nhập được Facebook (bạn đã hủy hoặc cửa sổ bị chặn). Bấm thử lại hoặc nhập số điện thoại. [mã: '+((x&&x.status)||'none')+', '+(window.self!==window.top?'trong khung':'toàn trang')+', '+(Date.now()-t1)+'ms]')},{scope:'public_profile'})}
+    catch(x){clearTimeout(to);rs('Không mở được cửa sổ Facebook ('+String(x&&x.message||x).slice(0,60)+'). Hãy nhập số điện thoại để nhận quà.')}}
   }catch(x){}
   return res};
  window.DCclaim.__v33=1}
