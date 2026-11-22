@@ -1,38 +1,41 @@
-/* v36: BỎ việc tắt Facebook trong khung (v35 sai: ảnh chụp 14:02 cho thấy cửa sổ Facebook vẫn mở được từ khung Google Sites; lỗi thật là "Miền chủ JSSDK không xác định" -> phải thêm miền vào "Allowed Domains for the JavaScript SDK" của app Facebook). Muốn tắt FB: thêm dòng try{window.CFG.FB_APP_ID=''}catch(e){} ngay dưới. */
-/* v34: (1) Máy chủ đang chạy bản cũ đòi họ tên khi nhận quà bằng SĐT -> bọc window.api: lệnh claim không có tên/Facebook thì tự thêm ten='Khách <4 số cuối>'. (2) Báo thêm mã chẩn đoán khi FB.login thất bại. */
+/* v37: BỎ Facebook JS SDK (FB.login trả "unknown" sau 1ms, không rõ vì sao). Tự mở cửa sổ bật lên bằng window.open rồi dẫn tới facebook.com/dialog/oauth (response_type=token, redirect_uri = chính trang game). Trang game trong cửa sổ bật lên đọc #access_token và postMessage về khung, rồi tự đóng. Nếu window.open trả null thì báo rõ "popup-null". Không phụ thuộc "Allowed Domains for the JavaScript SDK"; cần "Valid OAuth Redirect URIs" có địa chỉ trang game. Tắt FB: thêm try{window.CFG.FB_APP_ID=''}catch(e){} ngay dưới. */
+/* PHÍA CỬA SỔ BẬT LÊN: vừa quay về từ Facebook với #access_token -> báo cho khung rồi đóng */
+(function(){try{var H=location.hash||'',Q=location.search||'';if(!window.opener||window.opener===window)return;
+ var mt=/[#&]access_token=([^&]+)/.exec(H),st=/[#&]state=([^&]+)/.exec(H)||/[?&]state=([^&]+)/.exec(Q),er=/[?&#]error(_reason|_description)?=([^&]*)/.exec(Q+H);
+ if(!(st&&(mt||er)))return;
+ window.opener.postMessage({dcfb:decodeURIComponent(st[1]),tk:mt?decodeURIComponent(mt[1]):'',err:er?decodeURIComponent((er[2]||'').replace(/\+/g,' ')).slice(0,80):''},'*');
+ document.body.innerHTML='<p style="font:700 18px sans-serif;text-align:center;margin-top:30vh">Đã xong, đang đóng cửa sổ…</p>';
+ setTimeout(function(){try{window.close()}catch(e){}},400)}catch(e){}})();
+/* v34: máy chủ đang chạy bản cũ đòi họ tên khi nhận quà bằng SĐT -> bọc window.api: claim không có tên/Facebook thì tự thêm ten='Khách <4 số cuối>'. */
 (function(){var a0=window.api;if(typeof a0==='function'&&!a0.__v34){window.api=function(a,d){if(a==='claim'&&d&&!d.fbt&&!d.ten&&d.sdt)d=Object.assign({},d,{ten:'Khách '+String(d.sdt).slice(-4)});return a0.call(this,a,d)};window.api.__v34=1}})();
-/* v33: Đăng nhập Facebook bằng CỬA SỔ BẬT LÊN (FB.login) thay cho chuyển trang. Thất bại/bị chặn -> về nhập SĐT. */
+/* v37: đăng nhập Facebook bằng cửa sổ bật lên tự mở (không dùng SDK) */
 (function(){
-var fbErr='';
-function loadSDK(){
- if(window.FB&&window.__fbInit)return;
- if(document.getElementById('fb-sdk'))return;
- window.fbAsyncInit=function(){try{window.FB.init({appId:window.CFG.FB_APP_ID,version:'v19.0',cookie:false,xfbml:false});window.__fbInit=1}catch(e){fbErr='init'}};
- var s=document.createElement('script');s.id='fb-sdk';s.async=true;s.src='https://connect.facebook.net/vi_VN/sdk.js';s.onerror=function(){fbErr='load'};document.head.appendChild(s)}
 var orig=window.DCclaim;
-if(typeof orig==='function'&&!orig.__v33){
+if(typeof orig==='function'&&!orig.__v37){
  window.DCclaim=function(r,hd,tk,em){
   var res=orig.apply(this,arguments);
   try{
    if(tk||!(window.CFG&&window.CFG.FB_APP_ID))return res;
    var cb=document.getElementById('cb');
    if(!cb||!/FACEBOOK/i.test(cb.textContent))return res;
-   loadSDK();
    cb.onclick=function(){
-    var e=document.getElementById('ce');
-    if(fbErr){e.textContent='Không tải được Facebook trên máy này (mã: '+fbErr+'). Hãy nhập số điện thoại để nhận quà.';return}
-    if(!window.__fbInit||!window.FB){e.textContent='Đang kết nối Facebook, vui lòng bấm lại sau 2-3 giây';loadSDK();return}
-    e.textContent='';cb.disabled=true;var t0=cb.textContent;cb.textContent='⏳ Đang mở Facebook…';
-    var done=0,rs=function(m){if(done)return;done=1;cb.disabled=false;cb.textContent=t0;if(m)e.textContent=m};
-    var to=setTimeout(function(){rs('Facebook chưa phản hồi. Bấm thử lại hoặc nhập số điện thoại.')},90000);
-    var t1=Date.now();
-    try{window.FB.login(function(x){clearTimeout(to);var a=x&&x.authResponse;
-     if(a&&a.accessToken){done=1;window.DCclaim(r,hd,a.accessToken,'')}
-     else rs('Chưa đăng nhập được Facebook (bạn đã hủy hoặc cửa sổ bị chặn). Bấm thử lại hoặc nhập số điện thoại. [mã: '+((x&&x.status)||'none')+', '+(window.self!==window.top?'trong khung':'toàn trang')+', '+(Date.now()-t1)+'ms]')},{scope:'public_profile'})}
-    catch(x){clearTimeout(to);rs('Không mở được cửa sổ Facebook ('+String(x&&x.message||x).slice(0,60)+'). Hãy nhập số điện thoại để nhận quà.')}}
+    var e=document.getElementById('ce'),st=Math.random().toString(36).slice(2),RU=location.origin+location.pathname,fr=(window.self!==window.top?'trong khung':'toàn trang'),w=null;
+    try{w=window.open('about:blank','fbl_'+st,'width=520,height=700')}catch(x){}
+    if(!w){e.textContent='Khung nhúng không cho mở cửa sổ Facebook. Hãy nhập số điện thoại để nhận quà. [mã: popup-null, '+fr+']';return}
+    var t0=cb.textContent,done=0,iv=0,onm=null;
+    cb.disabled=true;cb.textContent='⏳ Đang chờ đăng nhập Facebook…';e.textContent='';
+    function stop(m){if(done)return;done=1;clearInterval(iv);window.removeEventListener('message',onm);cb.disabled=false;cb.textContent=t0;if(m)e.textContent=m}
+    onm=function(ev){var d=ev.data;if(!d||d.dcfb!==st)return;
+     if(d.tk){stop();try{w.close()}catch(x){}window.DCclaim(r,hd,d.tk,'')}
+     else{stop('Facebook không cho đăng nhập'+(d.err?' ('+d.err+')':'')+'. Bấm thử lại hoặc nhập số điện thoại. [địa chỉ quay về: '+RU+']')}};
+    window.addEventListener('message',onm);
+    var cl=0;iv=setInterval(function(){if(done)return;if(w.closed){if(++cl>3)stop('Chưa đăng nhập được Facebook (bạn đã đóng cửa sổ hoặc Facebook từ chối). Bấm thử lại hoặc nhập số điện thoại. [mã: closed, '+fr+', địa chỉ quay về: '+RU+']')}},500);
+    setTimeout(function(){if(!done)stop('Facebook chưa phản hồi. Bấm thử lại hoặc nhập số điện thoại.')},180000);
+    try{w.location.href='https://www.facebook.com/v19.0/dialog/oauth?client_id='+encodeURIComponent(window.CFG.FB_APP_ID)+'&redirect_uri='+encodeURIComponent(RU)+'&response_type=token&scope=public_profile&display=popup&state='+st}
+    catch(x){stop('Không mở được trang Facebook. Hãy nhập số điện thoại để nhận quà. [mã: nav-fail]')}}
   }catch(x){}
   return res};
- window.DCclaim.__v33=1}
+ window.DCclaim.__v37=1}
 })();
 /* nút CHIA SẺ LÊN FACEBOOK: chỉ sao chép nội dung + liên kết mở Facebook (tab mới), không tự tải ảnh/mở tab. */
 (function(){var rs=document.getElementById('rs');if(!rs)return;
