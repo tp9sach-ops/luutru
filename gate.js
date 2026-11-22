@@ -139,20 +139,25 @@ window.DCclaim=function(r,hd){
  function head(extra){b.innerHTML="<div class='big'>🎉</div><h2>Chúc mừng bạn!</h2>"+(im?"<img src='"+im+"' alt=''>":"")+"<p>Cọp của bạn đã đội quà về đích</p><h1>"+esc(r.ten)+"</h1>"+extra}
  function fin2(){imgP.then(function(bl){shareStep(b,r,bl)})}
  function fail(x,btn,label){var e=$('ce');if(/đã nhập thông tin/.test(x.message)){fin2();return}e.textContent=x.message;btn.disabled=false;btn.textContent=label}
+ function phoneForm(note){
+  head("<p>"+(note||"Nhập số điện thoại để nhận quà")+"</p><div class='fm'><input id='cp' type='tel' inputmode='numeric' maxlength='11' placeholder='Số điện thoại' autocomplete='tel'></div><p id='ce' class='ge'></p><button id='cb' class='btn' type='button'>🎁 NHẬN QUÀ</button>");
+  $('cb').onclick=function(){
+   var sdt=$('cp').value.replace(/[^0-9]/g,''),e=$('ce'),btn=$('cb');
+   if(!/^0[0-9]{9}$/.test(sdt)){e.textContent='Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0)';return}
+   e.textContent='';btn.disabled=true;btn.textContent='⏳ Đang gửi…';
+   window.api('claim',{sdt:sdt,hd:hd,tok:r.tok}).then(fin2).catch(function(x){fail(x,btn,'🎁 NHẬN QUÀ')})}}
  if(fbOn){
-  head("<p>Đăng nhập Facebook để xác nhận người nhận quà</p><p id='ce' class='ge'></p><button id='cb' class='btn' type='button' style='background:#1877f2;color:#fff'>🔐 ĐĂNG NHẬP FACEBOOK NHẬN QUÀ</button>");
-  $('cb').onclick=function(){var btn=$('cb'),L='🔐 ĐĂNG NHẬP FACEBOOK NHẬN QUÀ';btn.disabled=true;btn.textContent='⏳ Đang mở Facebook…';$('ce').textContent='';
+  var L='📣 ĐĂNG NHẬP FACEBOOK & CHIA SẺ';
+  head("<p>Đăng nhập Facebook để nhận quà và chia sẻ khoảnh khắc về nhất</p><p id='ce' class='ge'></p><button id='cb' class='btn' type='button' style='background:#1877f2;color:#fff'>"+L+"</button><p style='margin-top:10px'><a href='#' id='cs' style='color:#7a0a1c;font-weight:700'>Không dùng Facebook? Nhập số điện thoại</a></p>");
+  $('cs').onclick=function(ev){ev.preventDefault();phoneForm()};
+  $('cb').onclick=function(){var btn=$('cb');btn.disabled=true;btn.textContent='⏳ Đang mở Facebook…';$('ce').textContent='';
    loadFB().then(function(FB){FB.login(function(res){
     if(!res||!res.authResponse){$('ce').textContent='Bạn chưa đăng nhập Facebook';btn.disabled=false;btn.textContent=L;return}
     btn.textContent='⏳ Đang ghi nhận…';
-    window.api('claim',{fbt:res.authResponse.accessToken,hd:hd,tok:r.tok}).then(fin2).catch(function(x){fail(x,btn,L)})
-   },{scope:'public_profile'})}).catch(function(x){$('ce').textContent=x.message;btn.disabled=false;btn.textContent=L})};
+    window.api('claim',{fbt:res.authResponse.accessToken,hd:hd,tok:r.tok}).then(fin2).catch(function(x){
+     if(/Facebook/.test(x.message)){phoneForm('Đăng nhập Facebook chưa được, vui lòng nhập số điện thoại để nhận quà');return}
+     fail(x,btn,L)})
+   },{scope:'public_profile'})}).catch(function(){phoneForm('Không mở được Facebook, vui lòng nhập số điện thoại để nhận quà')})};
   return}
- head("<p>Nhập thông tin để nhận quà</p><div class='fm'><input id='cn' placeholder='Họ tên' autocomplete='name'><input id='cp' type='tel' inputmode='numeric' maxlength='11' placeholder='Số điện thoại' autocomplete='tel'></div><p id='ce' class='ge'></p><button id='cb' class='btn' type='button'>🎁 NHẬN QUÀ</button>");
- $('cb').onclick=function(){
-  var ten=$('cn').value.trim(),sdt=$('cp').value.replace(/[^0-9]/g,''),e=$('ce'),btn=$('cb');
-  if(!ten){e.textContent='Vui lòng nhập họ tên';return}
-  if(!/^0[0-9]{9}$/.test(sdt)){e.textContent='Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0)';return}
-  e.textContent='';btn.disabled=true;btn.textContent='⏳ Đang gửi…';
-  window.api('claim',{ten:ten,sdt:sdt,hd:hd,tok:r.tok}).then(fin2).catch(function(x){fail(x,btn,'🎁 NHẬN QUÀ')})}};
+ phoneForm()};
 })();
