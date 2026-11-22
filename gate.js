@@ -102,18 +102,57 @@ gb.addEventListener('click',function(){
   if(m){err(m);gb.disabled=false;gb.textContent='🐯 VÀO ĐUA';return}
   window.__gate=1;g.classList.add('out');setTimeout(function(){if(g.parentNode)g.parentNode.removeChild(g)},700)})});
 gh.addEventListener('keydown',function(e){if(e.key==='Enter')gb.click()});
-/* Sau khi đua xong: khách nhập tên + SĐT để nhận quà */
+/* Sau khi đua xong: khách đăng nhập Facebook (lấy UID) -> nhận quà -> chia sẻ khoảnh khắc về nhất. Chưa cấu hình CFG.FB_APP_ID thì dùng form tên + SĐT như cũ. */
+var HASH='#9sach #banhsaurieng9sach #duacop #duongduaquagiangsinh';
+function loadFB(){return new Promise(function(ok,no){
+ if(window.FB&&window.__fbInit)return ok(window.FB);
+ window.fbAsyncInit=function(){try{window.FB.init({appId:window.CFG.FB_APP_ID,version:'v19.0',cookie:false,xfbml:false});window.__fbInit=1;ok(window.FB)}catch(e){no(e)}};
+ var s=document.createElement('script');s.async=true;s.src='https://connect.facebook.net/vi_VN/sdk.js';s.onerror=function(){no(new Error('Không tải được Facebook'))};document.head.appendChild(s);
+ setTimeout(function(){if(!window.__fbInit)no(new Error('Facebook phản hồi quá lâu, vui lòng thử lại'))},12000)})}
+/* Ảnh chia sẻ: khung hình cọp về đích chụp từ cảnh 3D + dải chữ quà */
+function shareImg(prize){return new Promise(function(ok){
+ var src=window.__snap;if(!src)return ok(null);
+ var im=new Image();im.onload=function(){
+  var W=1080,H=1350,c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d');
+  var k=Math.max(W/im.width,H/im.height),w=im.width*k,h=im.height*k;x.drawImage(im,(W-w)/2,(H-h)/2,w,h);
+  var g=x.createLinearGradient(0,H-330,0,H);g.addColorStop(0,'rgba(5,30,22,0)');g.addColorStop(1,'rgba(5,30,22,.92)');x.fillStyle=g;x.fillRect(0,H-330,W,330);
+  x.textAlign='center';x.fillStyle='#ffe08a';x.font='800 40px "Be Vietnam Pro",sans-serif';x.fillText('9 SẠCH · ĐUA CỌP GIÁNG SINH',W/2,H-200);
+  x.fillStyle='#fff';x.font='900 78px "Be Vietnam Pro",sans-serif';x.fillText('VỀ NHẤT! '+String(prize||'').slice(0,22),W/2,H-110);
+  x.fillStyle='#ffd05a';x.font='700 34px "Be Vietnam Pro",sans-serif';x.fillText(HASH.split(' ')[0]+' '+HASH.split(' ')[2],W/2,H-50);
+  c.toBlob(function(b){ok(b)},'image/jpeg',.9)};
+ im.onerror=function(){ok(null)};im.src=src})}
+function shareStep(b,r,blob){
+ var cap='Mình vừa về nhất Đường Đua Quà Giáng Sinh của 9 Sạch và trúng '+r.ten+'! '+HASH,url=location.origin+location.pathname,imgUrl=blob?URL.createObjectURL(blob):'';
+ b.innerHTML="<div class='big'>✅</div><h2>Đã ghi nhận quà!</h2>"+(imgUrl?"<img src='"+imgUrl+"' alt='' style='max-width:62%;max-height:240px;border-radius:14px'>":"")+"<h1>"+esc(r.ten)+"</h1><p>Bấm chia sẻ lên Facebook, nội dung bài đăng đã được sao chép sẵn, chỉ cần dán và đăng.</p><p id='se' class='ge'></p><button id='sb' class='btn' type='button'>📣 CHIA SẺ LÊN FACEBOOK</button><button class='btn' type='button' id='sx' style='background:#6b7280'>Đóng, đưa màn hình cho nhân viên nhận quà</button>";
+ $('sx').onclick=function(){location.reload()};
+ $('sb').onclick=function(){
+  var e=$('se');try{if(navigator.clipboard)navigator.clipboard.writeText(cap)}catch(x){}
+  var f=blob?new File([blob],'9sach-duacop.jpg',{type:'image/jpeg'}):null;
+  if(f&&navigator.canShare&&navigator.canShare({files:[f]})){
+   navigator.share({files:[f],text:cap}).catch(function(){});e.textContent='Đã sao chép nội dung, hãy dán khi đăng.';return}
+  if(blob){var a=document.createElement('a');a.href=imgUrl;a.download='9sach-duacop.jpg';document.body.appendChild(a);a.click();a.remove();e.textContent='Đã sao chép nội dung và tải ảnh về máy, hãy đính kèm ảnh khi đăng.'}
+  else e.textContent='Đã sao chép nội dung, hãy dán khi đăng.';
+  window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url)+'&hashtag='+encodeURIComponent('#9sach'),'_blank')}}
 window.DCclaim=function(r,hd){
- var rs=$('rs'),b=rs.querySelector('.box'),im=window.DC.img(r.ten);
- b.innerHTML="<div class='big'>🎉</div><h2>Chúc mừng bạn!</h2>"+(im?"<img src='"+im+"' alt=''>":"")+"<p>Cọp của bạn đã đội quà về đích</p><h1>"+esc(r.ten)+"</h1><p>Nhập thông tin để nhận quà</p><div class='fm'><input id='cn' placeholder='Họ tên' autocomplete='name'><input id='cp' type='tel' inputmode='numeric' maxlength='11' placeholder='Số điện thoại' autocomplete='tel'></div><p id='ce' class='ge'></p><button id='cb' class='btn' type='button'>🎁 NHẬN QUÀ</button>";
+ var rs=$('rs'),b=rs.querySelector('.box'),im=window.DC.img(r.ten),fbOn=!!(window.CFG&&window.CFG.FB_APP_ID),imgP=shareImg(r.ten);
  rs.hidden=false;
- function done(ch){b.innerHTML="<div class='big'>✅</div><h2>Đã ghi nhận!</h2><h1>"+esc(r.ten)+"</h1><p>Vui lòng đưa màn hình này cho nhân viên"+(ch?" tại <b>"+esc(ch)+"</b>":"")+" để nhận quà. 🎅</p><button class='btn' onclick='location.reload()'>Đóng</button>"}
+ function head(extra){b.innerHTML="<div class='big'>🎉</div><h2>Chúc mừng bạn!</h2>"+(im?"<img src='"+im+"' alt=''>":"")+"<p>Cọp của bạn đã đội quà về đích</p><h1>"+esc(r.ten)+"</h1>"+extra}
+ function fin2(){imgP.then(function(bl){shareStep(b,r,bl)})}
+ function fail(x,btn,label){var e=$('ce');if(/đã nhập thông tin/.test(x.message)){fin2();return}e.textContent=x.message;btn.disabled=false;btn.textContent=label}
+ if(fbOn){
+  head("<p>Đăng nhập Facebook để xác nhận người nhận quà</p><p id='ce' class='ge'></p><button id='cb' class='btn' type='button' style='background:#1877f2;color:#fff'>🔐 ĐĂNG NHẬP FACEBOOK NHẬN QUÀ</button>");
+  $('cb').onclick=function(){var btn=$('cb'),L='🔐 ĐĂNG NHẬP FACEBOOK NHẬN QUÀ';btn.disabled=true;btn.textContent='⏳ Đang mở Facebook…';$('ce').textContent='';
+   loadFB().then(function(FB){FB.login(function(res){
+    if(!res||!res.authResponse){$('ce').textContent='Bạn chưa đăng nhập Facebook';btn.disabled=false;btn.textContent=L;return}
+    btn.textContent='⏳ Đang ghi nhận…';
+    window.api('claim',{fbt:res.authResponse.accessToken,hd:hd,tok:r.tok}).then(fin2).catch(function(x){fail(x,btn,L)})
+   },{scope:'public_profile'})}).catch(function(x){$('ce').textContent=x.message;btn.disabled=false;btn.textContent=L})};
+  return}
+ head("<p>Nhập thông tin để nhận quà</p><div class='fm'><input id='cn' placeholder='Họ tên' autocomplete='name'><input id='cp' type='tel' inputmode='numeric' maxlength='11' placeholder='Số điện thoại' autocomplete='tel'></div><p id='ce' class='ge'></p><button id='cb' class='btn' type='button'>🎁 NHẬN QUÀ</button>");
  $('cb').onclick=function(){
-  var ten=$('cn').value.trim(),sdt=$('cp').value.replace(/[^0-9]/g,''),e=$('ce');
+  var ten=$('cn').value.trim(),sdt=$('cp').value.replace(/[^0-9]/g,''),e=$('ce'),btn=$('cb');
   if(!ten){e.textContent='Vui lòng nhập họ tên';return}
   if(!/^0[0-9]{9}$/.test(sdt)){e.textContent='Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0)';return}
-  e.textContent='';$('cb').disabled=true;$('cb').textContent='⏳ Đang gửi…';
-  window.api('claim',{ten:ten,sdt:sdt,hd:hd,tok:r.tok}).then(function(x){done(x&&x.ch)}).catch(function(x){
-   if(/đã nhập thông tin/.test(x.message)){done('');return}
-   e.textContent=x.message;$('cb').disabled=false;$('cb').textContent='🎁 NHẬN QUÀ'})}};
+  e.textContent='';btn.disabled=true;btn.textContent='⏳ Đang gửi…';
+  window.api('claim',{ten:ten,sdt:sdt,hd:hd,tok:r.tok}).then(fin2).catch(function(x){fail(x,btn,'🎁 NHẬN QUÀ')})}};
 })();

@@ -583,7 +583,7 @@ function celebrate(){
   var sg=new TH.Sprite(new TH.SpriteMaterial({map:TX.glowY,transparent:true,opacity:.8,depthWrite:false,blending:TH.AdditiveBlending}));sg.scale.set(26,26,1);sg.position.set(wo.x,4.5,wo.z);world.add(sg);
   setTimeout(function(){fin(plan.r)},3400)}
 
-function fin(r){if(window.DCclaim&&window.__dcHd)return window.DCclaim(r,window.__dcHd);
+function fin(r){if(window.DCclaim&&window.__dcHd){window.__snapReq=1;return setTimeout(function(){window.DCclaim(r,window.__dcHd)},120)}
   $('rn').textContent=$('nm').value;$('rp').textContent=r.ten;
   var im=IM[r.ten];$('ri').hidden=!im;if(im)$('ri').src=im;
   $('rs').hidden=false}
