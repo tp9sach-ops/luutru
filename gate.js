@@ -155,7 +155,7 @@ window.DCclaim=function(r,hd){
    if(!window.FB||!window.__fbInit){$('ce').textContent='Đang tải Facebook, vui lòng bấm lại sau 1-2 giây';loadFB().catch(function(){phoneForm('Không mở được Facebook, vui lòng nhập số điện thoại để nhận quà')});return}
    btn.disabled=true;btn.textContent='⏳ Đang mở Facebook…';$('ce').textContent='';
    window.FB.login(function(res){
-    if(!res||!res.authResponse){$('ce').textContent='Chưa đăng nhập được Facebook (nếu cửa sổ bị chặn, hãy cho phép cửa sổ bật lên rồi bấm lại)';btn.disabled=false;btn.textContent=L;return}
+    if(!res||!res.authResponse){$('ce').textContent='Chưa đăng nhập được Facebook (mã: '+((res&&res.status)||'không phản hồi')+'). Nếu cửa sổ bị chặn, hãy cho phép cửa sổ bật lên rồi bấm lại.';try{console.warn('FB.login',JSON.stringify(res))}catch(e){}btn.disabled=false;btn.textContent=L;return}
     btn.textContent='⏳ Đang ghi nhận…';
     window.api('claim',{fbt:res.authResponse.accessToken,hd:hd,tok:r.tok}).then(fin2).catch(function(x){
      if(/Facebook/.test(x.message)){phoneForm('Đăng nhập Facebook chưa được, vui lòng nhập số điện thoại để nhận quà');return}
