@@ -103,6 +103,7 @@ gb.addEventListener('click',function(){
   window.__gate=1;g.classList.add('out');setTimeout(function(){if(g.parentNode)g.parentNode.removeChild(g)},700)})});
 gh.addEventListener('keydown',function(e){if(e.key==='Enter')gb.click()});
 /* Sau khi đua xong: khách đăng nhập Facebook (lấy UID) -> nhận quà -> chia sẻ khoảnh khắc về nhất. Chưa cấu hình CFG.FB_APP_ID thì dùng form tên + SĐT như cũ. */
+/* v7: đăng nhập Facebook bằng CHUYỂN TRANG (không dùng cửa sổ bật lên, tránh trình duyệt di động chặn): bấm nút -> sang facebook.com/dialog/oauth -> quay lại đúng trang này kèm #access_token (xử lý ở cuối file). */
 var HASH='#9sach #banhsaurieng9sach #duacop #duongduaquagiangsinh';
 function loadFB(){return new Promise(function(ok,no){
  if(window.FB&&window.__fbInit)return ok(window.FB);
@@ -133,7 +134,7 @@ function shareStep(b,r,blob){
   if(blob){var a=document.createElement('a');a.href=imgUrl;a.download='9sach-duacop.jpg';document.body.appendChild(a);a.click();a.remove();e.textContent='Đã sao chép nội dung và tải ảnh về máy, hãy đính kèm ảnh khi đăng.'}
   else e.textContent='Đã sao chép nội dung, hãy dán khi đăng.';
   window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url)+'&hashtag='+encodeURIComponent('#9sach'),'_blank')}}
-window.DCclaim=function(r,hd){
+window.DCclaim=function(r,hd,rtok,rerr){
  var rs=$('rs'),b=rs.querySelector('.box'),im=window.DC.img(r.ten),fbOn=!!(window.CFG&&window.CFG.FB_APP_ID),imgP=shareImg(r.ten);
  rs.hidden=false;
  function head(extra){b.innerHTML="<div class='big'>🎉</div><h2>Chúc mừng bạn!</h2>"+(im?"<img src='"+im+"' alt=''>":"")+"<p>Cọp của bạn đã đội quà về đích</p><h1>"+esc(r.ten)+"</h1>"+extra}
@@ -150,17 +151,28 @@ window.DCclaim=function(r,hd){
   var L='📣 ĐĂNG NHẬP FACEBOOK & CHIA SẺ';
   head("<p>Đăng nhập Facebook để nhận quà và chia sẻ khoảnh khắc về nhất</p><p id='ce' class='ge'></p><button id='cb' class='btn' type='button' style='background:#1877f2;color:#fff'>"+L+"</button><p style='margin-top:10px'><a href='#' id='cs' style='color:#7a0a1c;font-weight:700'>Không dùng Facebook? Nhập số điện thoại</a></p>");
   $('cs').onclick=function(ev){ev.preventDefault();phoneForm()};
-  loadFB().catch(function(){});
-  $('cb').onclick=function(){var btn=$('cb');
-   if(!window.FB||!window.__fbInit){$('ce').textContent='Đang tải Facebook, vui lòng bấm lại sau 1-2 giây';loadFB().catch(function(){phoneForm('Không mở được Facebook, vui lòng nhập số điện thoại để nhận quà')});return}
-   btn.disabled=true;btn.textContent='⏳ Đang mở Facebook…';$('ce').textContent='';
-   window.FB.login(function(res){
-    if(!res||!res.authResponse){$('ce').textContent='Chưa đăng nhập được Facebook (mã: '+((res&&res.status)||'không phản hồi')+'). Nếu cửa sổ bị chặn, hãy cho phép cửa sổ bật lên rồi bấm lại.';try{console.warn('FB.login',JSON.stringify(res))}catch(e){}btn.disabled=false;btn.textContent=L;return}
-    btn.textContent='⏳ Đang ghi nhận…';
-    window.api('claim',{fbt:res.authResponse.accessToken,hd:hd,tok:r.tok}).then(fin2).catch(function(x){
-     if(/Facebook/.test(x.message)){phoneForm('Đăng nhập Facebook chưa được, vui lòng nhập số điện thoại để nhận quà');return}
-     fail(x,btn,L)})
-   },{scope:'public_profile'})};
+  function go(tk){var btn=$('cb');btn.disabled=true;btn.textContent='⏳ Đang ghi nhận…';
+   window.api('claim',{fbt:tk,hd:hd,tok:r.tok}).then(fin2).catch(function(x){
+    if(/Facebook/.test(x.message)){phoneForm('Đăng nhập Facebook chưa được, vui lòng nhập số điện thoại để nhận quà');return}
+    fail(x,btn,L)})}
+  $('cb').onclick=function(){var btn=$('cb'),st=Math.random().toString(36).slice(2),ru=location.origin+location.pathname,sn=(typeof window.__snap==='string'&&window.__snap.length<1500000)?window.__snap:'';
+   btn.disabled=true;btn.textContent='⏳ Đang chuyển sang Facebook…';$('ce').textContent='';
+   try{sessionStorage.setItem('dcfb',JSON.stringify({r:r,hd:hd,st:st,snap:sn}))}catch(e){try{sessionStorage.setItem('dcfb',JSON.stringify({r:r,hd:hd,st:st,snap:''}))}catch(e2){}}
+   location.href='https://www.facebook.com/v19.0/dialog/oauth?client_id='+encodeURIComponent(window.CFG.FB_APP_ID)+'&redirect_uri='+encodeURIComponent(ru)+'&response_type=token&scope=public_profile&state='+st};
+  if(rtok){go(rtok);return}
+  if(rerr)$('ce').textContent=rerr;
   return}
  phoneForm()};
+/* v7: quay lại từ Facebook (chuyển trang, không dùng cửa sổ bật lên): đọc token ở #access_token, bỏ cổng, mở lại bước nhận quà */
+(function(){var sv=null,H=location.hash||'',Q=location.search||'',mt=/[#&]access_token=([^&]+)/.exec(H),st=/[#&]state=([^&]+)/.exec(H)||/[?&]state=([^&]+)/.exec(Q),er=/[?&]error(_reason|_description)?=|[#&]error=/.test(Q+H);
+ try{sv=JSON.parse(sessionStorage.getItem('dcfb')||'null')}catch(e){}
+ if(!sv||!(mt||er))return;
+ try{sessionStorage.removeItem('dcfb')}catch(e){}
+ try{history.replaceState(null,'',location.pathname)}catch(e){}
+ var tk=null,em='';
+ if(mt&&st&&st[1]===sv.st)tk=decodeURIComponent(mt[1]);
+ else em=mt?'Phiên đăng nhập Facebook không khớp, vui lòng thử lại':'Facebook không cho đăng nhập (bạn đã hủy hoặc ứng dụng chưa được phép). Bấm thử lại hoặc nhập số điện thoại.';
+ if(sv.snap)window.__snap=sv.snap;
+ window.__dcHd=sv.hd;g.style.display='none';
+ var n=0,tm=setInterval(function(){if((window.api&&$('rs'))||++n>100){clearInterval(tm);if(g.parentNode)g.parentNode.removeChild(g);window.DCclaim(sv.r,sv.hd,tk,em)}},100)})();
 })();
