@@ -99,6 +99,8 @@
     if (st === 'intro') tk = 0;
     else if (st === 'warm') { tk = .42; lean = .1; }
     if (wingo) tk = 0;
+    /* v22: cọp đang tăng tốc chúi hẳn về trước, cọp top 3 gắng sức thêm (l.rk = hạng, do patches-drama.js gán) */
+    if (st === 'race' && !wingo) lean = Math.max(0, Math.min(.2, (v - .9) * .8)) + (l.rk !== undefined && l.rk < 3 ? .06 : 0);
     /* xuất phát: chạy luôn – sàn tốc độ chạy trong ~2.6 s đầu để chân không đứng đơ trong lúc vị trí đang tăng tốc */
     if (st === 'race' && !wingo && rt < 2.6) tk = Math.max(tk, .55 * (1 - M.sstep(1.2, 2.6, rt)));
     /* tư thế sẵn sàng: khi chưa chạy (idle, giới thiệu trừ cọp giữa đang vẫy, đếm ngược) */

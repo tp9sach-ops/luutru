@@ -12,7 +12,7 @@ window.TIGER_FALL = {
    amp = biên độ nhiễu (phần của tốc độ TB, 0.22 ≈ dao động hiệu dụng ~10%); burst = biên độ cú bứt; nb = số cú bứt tối đa/cọp/ván; kmin,kmax = khoảng cách nút nhiễu (giây, lớn = chậm/êm);
    amax = độ dốc tối đa của hệ số tốc độ (đơn vị: tốc độ TB mỗi giây); win = lợi thế tốc độ tăng dần tới giây 8 của cọp trúng quà (ĐỂ 0: đặt dương làm cọp trúng quà tụt đầu đua do mkTab chuẩn hóa quãng đường); spr = hệ số nhân cú nước rút cuối của cọp trúng quà (nhỏ = ít tụt giữa chặng).
    LƯU Ý TÊN BIẾN: trong game.js đã có biến PC (các hộp hạt) nên cấu hình nhịp trong game tên là TPC, KHÔNG đặt PC. */
-window.TIGER_PACE = { amp: .2, burst: .14, nb: 3, kmin: 1.1, kmax: 2.6, amax: .5, win: 0, spr: .3 };
+window.TIGER_PACE = { amp: .3, burst: .22, nb: 4, kmin: 1.4, kmax: 3.2, amax: .6, win: 0, spr: .3 };
 window.P23=[
 /* hệ số tốc độ khi té: chậm dần lúc vấp, gần đứng yên lúc nằm, tăng lại khi đứng dậy */
 [`function mkTab(f,c1,c2,p1,p2,WS){`,`var FSK=[[0,1],[.25,.6],[.6,.3],[1,.08],[2,.03],[2.6,.12],[3.2,.55],[3.9,1]];
@@ -34,7 +34,7 @@ for(b=0;b<nbr;b++){bt=3+Math.random()*Math.max(.5,f-9);bw=.45+Math.random()*.4;b
 for(i=0;i<N;i++){t=i*dt;u=(t-bt)/bw;if(u>0&&u<1){v=Math.sin(Math.PI*u);A[i]+=ba*v*v}else if(u>=1&&u<3.2){v=Math.sin(Math.PI*(u-1)/2.2);A[i]-=ba*.3*v*v}}}
 prev=0;for(i=0;i<N;i++){x=A[i]-prev;if(x>lim)x=lim;else if(x<-lim)x=-lim;prev+=x;A[i]=prev}
 return function(t){var q=t/dt,k=q|0;if(k<0)return 0;if(k>=N-1)return A[N-1];return A[k]+(A[k+1]-A[k])*(q-k)}}
-function mkTab(f,c1,c2,p1,p2,WS,FT){var nz0=mkPace(f),nz=function(t){var u=Math.max(0,Math.min(1,(f-t)/3));return nz0(t)*(.2+.8*u*u*(3-2*u))};`],
+function mkTab(f,c1,c2,p1,p2,WS,FT){var nz0=mkPace(f),nz=function(t){var u=Math.max(0,Math.min(1,(f-t)/3));return nz0(t)*(.4+.6*u*u*(3-2*u))};`],
 [`m=1+g0*(.36*Math.sin(TWO*c1*3.2*t+p1)+.2*Math.sin(TWO*c2*2.2*t+p2)+.12*Math.sin(TWO*(c1+c2)*1.7*t+p1-p2));return e*m*(1+(WS||0)*sw)}`,`m=1+g0*nz(t);return e*m*(1+(WS||0)*sw*TPC.spr+(WS?TPC.win*Math.min(1,t/8):0))*fallSpd(t,FT===undefined?-1:FT)}`],
 [`var f=[],tab=[],mx=DUR;`,`var f=[],tab=[],mx=DUR,FT=pickFalls(LP.length,wi);LN.forEach(function(l){l.dz=0});`],
 [`Math.random()*TWO,Math.random()*TWO,i==wi?.22+Math.random()*.2:0))}`,`Math.random()*TWO,Math.random()*TWO,i==wi?.22+Math.random()*.2:0,FT[i]))}`],
