@@ -1,9 +1,11 @@
-/* v42: KHÔNG còn đăng nhập Facebook (không lấy UID nữa). Màn chúc mừng: ảnh ghép (khoảnh khắc chạm đích + bục vinh quang 1-2-3 từ finale.js) + nút CHIA SẺ LÊN FACEBOOK (1 chạm): sao chép sẵn caption + hashtag, mở menu chia sẻ của máy kèm ảnh (Android/iOS), khách chọn Facebook rồi dán caption và đăng. Máy/khung không hỗ trợ menu chia sẻ (vd khung nhúng Google Sites): tải ảnh + mở trang chia sẻ Facebook có sẵn caption. Dự phòng bên dưới: nút nhập Họ tên + SĐT để nhân viên trao quà (claim như cũ). */
+/* v44: SỬA LỖI chia sẻ FB hiện thẻ link "gstatic.com - Error 404": trước đây link chia sẻ lấy từ document.referrer, trong khung Google Sites referrer là địa chỉ gstatic.com nên bị 404. Nay dùng link cố định SHARE_URL. Ảnh tải về tên duongduaquagiangsinh.jpg.
+   v42: KHÔNG còn đăng nhập Facebook (không lấy UID nữa). Màn chúc mừng: ảnh ghép (khoảnh khắc chạm đích + bục vinh quang 1-2-3 từ finale.js) + nút CHIA SẺ LÊN FACEBOOK (1 chạm): sao chép sẵn caption + hashtag, mở menu chia sẻ của máy kèm ảnh (Android/iOS), khách chọn Facebook rồi dán caption và đăng. Máy/khung không hỗ trợ menu chia sẻ (vd khung nhúng Google Sites): tải ảnh + mở trang chia sẻ Facebook có sẵn caption. Dự phòng bên dưới: nút nhập Họ tên + SĐT để nhân viên trao quà (claim như cũ). */
 try{window.CFG=window.CFG||{};window.CFG.FB_APP_ID=''}catch(e){}
 /* v34: máy chủ cũ đòi họ tên -> claim không có tên thì tự thêm ten='Khách <4 số cuối>'. */
 (function(){var a0=window.api;if(typeof a0==='function'&&!a0.__v34){window.api=function(a,d){if(a==='claim'&&d&&!d.fbt&&!d.ten&&d.sdt)d=Object.assign({},d,{ten:'Khách '+String(d.sdt).slice(-4)});return a0.call(this,a,d)};window.api.__v34=1}})();
 (function(){
 var HASH='#9sach #banhsaurieng9sach #duacop #duongduaquagiangsinh';
+var SHARE_URL='https://www.baocaonoibo.io.vn/duacop',FILE='duongduaquagiangsinh.jpg';
 function $(i){return document.getElementById(i)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function loadImg(src){return new Promise(function(ok){if(!src)return ok(null);var im=new Image();im.onload=function(){ok(im)};im.onerror=function(){ok(null)};im.src=src})}
@@ -32,7 +34,7 @@ function copyText(t){
 window.DCclaim=function(r,hd){
  var rs=$('rs');if(!rs)return;rs.hidden=false;var b=rs.querySelector('.box'),blob=null,
   cap='Mình vừa về nhất Đường Đua Quà Giáng Sinh của 9 Sạch và trúng '+r.ten+'! 🐯🎄\n'+HASH,
-  url=(document.referrer&&/^https?:/.test(document.referrer)?document.referrer:location.origin+location.pathname);
+  url=SHARE_URL;
  b.innerHTML="<div class='big'>🎉</div><h2>Chúc mừng bạn!</h2><p>Đang chuẩn bị ảnh chiến thắng…</p><h1>"+esc(r.ten)+"</h1>";
  mkCollage(r.ten).then(function(bl){blob=bl;view()});
  function view(){
@@ -49,13 +51,13 @@ window.DCclaim=function(r,hd){
   $('cb').onclick=doClaim}
  function viaLink(){
   var e=$('se'),fb='https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url)+'&quote='+encodeURIComponent(cap)+'&hashtag='+encodeURIComponent('#9sach'),w=null;
-  if(blob){try{var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='9sach-duacop.jpg';document.body.appendChild(a);a.click();a.remove()}catch(x){}}
+  if(blob){try{var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=FILE;document.body.appendChild(a);a.click();a.remove()}catch(x){}}
   try{w=window.open(fb,'_blank')}catch(x){}
-  e.innerHTML='Đã sao chép caption'+(blob?' và tải ảnh về máy':'')+'. '+(w?'':'<a href="'+fb+'" target="_blank" rel="noopener" style="color:#1877f2;font-weight:800">Bấm đây để mở Facebook</a>. ')+'Trên Facebook: đính kèm ảnh (hoặc giữ ảnh ở trên để lưu), dán caption rồi đăng.'}
+  e.innerHTML='Đã sao chép caption'+(blob?' và tải ảnh về máy':'')+'. '+(w?'':'<a href="'+fb+'" target="_blank" rel="noopener" style="color:#1877f2;font-weight:800">Bấm đây để mở Facebook</a>. ')+'Trên Facebook: đính kèm ảnh vừa tải (hoặc giữ ảnh ở trên để lưu), dán caption rồi đăng.'}
  function doShare(){
   var e=$('se');copyText(cap);
   var f=null,can=false;
-  try{if(blob)f=new File([blob],'9sach-duacop.jpg',{type:'image/jpeg'})}catch(x){}
+  try{if(blob)f=new File([blob],FILE,{type:'image/jpeg'})}catch(x){}
   try{can=!!(f&&navigator.share&&navigator.canShare&&navigator.canShare({files:[f]}))}catch(x){}
   if(can){
    e.textContent='Đã sao chép caption. Chọn Facebook, dán caption rồi bấm Đăng.';
