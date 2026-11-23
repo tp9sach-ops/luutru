@@ -1,11 +1,11 @@
-/* v44: SỬA LỖI chia sẻ FB hiện thẻ link "gstatic.com - Error 404": trước đây link chia sẻ lấy từ document.referrer, trong khung Google Sites referrer là địa chỉ gstatic.com nên bị 404. Nay dùng link cố định SHARE_URL. Ảnh tải về tên duongduaquagiangsinh.jpg.
-   v42: KHÔNG còn đăng nhập Facebook (không lấy UID nữa). Màn chúc mừng: ảnh ghép (khoảnh khắc chạm đích + bục vinh quang 1-2-3 từ finale.js) + nút CHIA SẺ LÊN FACEBOOK (1 chạm): sao chép sẵn caption + hashtag, mở menu chia sẻ của máy kèm ảnh (Android/iOS), khách chọn Facebook rồi dán caption và đăng. Máy/khung không hỗ trợ menu chia sẻ (vd khung nhúng Google Sites): tải ảnh + mở trang chia sẻ Facebook có sẵn caption. Dự phòng bên dưới: nút nhập Họ tên + SĐT để nhân viên trao quà (claim như cũ). */
+/* v46: KHÔNG gửi link nữa. Nút chia sẻ: (1) máy cho phép -> menu chia sẻ của máy kèm ảnh + caption; (2) khung nhúng (Google Sites) chặn menu chia sẻ -> mở share.html ở THẺ MỚI (không bị khung chặn), ảnh + caption được chuyển sang bằng postMessage, khách bấm nút ở đó để mở menu chia sẻ kèm ảnh; (3) popup bị chặn -> tải ảnh về + sao chép caption.
+   v44: ảnh tải về tên duongduaquagiangsinh.jpg. v42: không còn đăng nhập Facebook. Dự phòng: nhập Họ tên + SĐT để nhân viên trao quà (claim như cũ). */
 try{window.CFG=window.CFG||{};window.CFG.FB_APP_ID=''}catch(e){}
 /* v34: máy chủ cũ đòi họ tên -> claim không có tên thì tự thêm ten='Khách <4 số cuối>'. */
 (function(){var a0=window.api;if(typeof a0==='function'&&!a0.__v34){window.api=function(a,d){if(a==='claim'&&d&&!d.fbt&&!d.ten&&d.sdt)d=Object.assign({},d,{ten:'Khách '+String(d.sdt).slice(-4)});return a0.call(this,a,d)};window.api.__v34=1}})();
 (function(){
 var HASH='#9sach #banhsaurieng9sach #duacop #duongduaquagiangsinh';
-var SHARE_URL='https://www.baocaonoibo.io.vn/duacop',FILE='duongduaquagiangsinh.jpg';
+var FILE='duongduaquagiangsinh.jpg';
 function $(i){return document.getElementById(i)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function loadImg(src){return new Promise(function(ok){if(!src)return ok(null);var im=new Image();im.onload=function(){ok(im)};im.onerror=function(){ok(null)};im.src=src})}
@@ -33,15 +33,14 @@ function copyText(t){
  try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).catch(function(){})}catch(e){}}
 window.DCclaim=function(r,hd){
  var rs=$('rs');if(!rs)return;rs.hidden=false;var b=rs.querySelector('.box'),blob=null,
-  cap='Mình vừa về nhất Đường Đua Quà Giáng Sinh của 9 Sạch và trúng '+r.ten+'! 🐯🎄\n'+HASH,
-  url=SHARE_URL;
+  cap='Mình vừa về nhất Đường Đua Quà Giáng Sinh của 9 Sạch và trúng '+r.ten+'! 🐯🎄\n'+HASH;
  b.innerHTML="<div class='big'>🎉</div><h2>Chúc mừng bạn!</h2><p>Đang chuẩn bị ảnh chiến thắng…</p><h1>"+esc(r.ten)+"</h1>";
  mkCollage(r.ten).then(function(bl){blob=bl;view()});
  function view(){
   var u=blob?URL.createObjectURL(blob):'';
   b.innerHTML="<div class='big'>🎉</div><h2>Chúc mừng bạn!</h2>"+(u?"<img src='"+u+"' alt='' style='width:100%;max-width:330px;border-radius:14px'>":"")+"<p>Cọp của bạn đã đội quà về đích</p><h1>"+esc(r.ten)+"</h1><p id='se' class='ge'></p>"+
    "<button id='sb2' class='btn' type='button' style='background:#1877f2;color:#fff'>📣 CHIA SẺ LÊN FACEBOOK</button>"+
-   "<p style='font-size:13px;margin:6px 0 10px'>Bấm 1 lần: caption + hashtag được sao chép sẵn, ảnh gửi kèm. Chọn Facebook, dán caption rồi bấm Đăng.</p>"+
+   "<p style='font-size:13px;margin:6px 0 10px'>Bấm 1 lần: ảnh + caption + hashtag được chuẩn bị sẵn. Chọn Facebook rồi bấm Đăng.</p>"+
    "<button id='tg' class='btn' type='button' style='background:#fff;color:#7a0a1c;border:2px solid #d8132f'>🎁 Nhập tên &amp; SĐT để nhận quà</button>"+
    "<div id='fm' hidden><div class='fm'><input id='cn' type='text' maxlength='60' placeholder='Họ và tên' autocomplete='name'><input id='cp' type='tel' inputmode='numeric' maxlength='11' placeholder='Số điện thoại' autocomplete='tel'></div><p id='ce' class='ge'></p><button id='cb' class='btn' type='button'>🎁 NHẬN QUÀ</button></div>"+
    "<button id='sx' class='btn' type='button' style='background:#6b7280;margin-top:8px'>Đóng</button>";
@@ -49,20 +48,30 @@ window.DCclaim=function(r,hd){
   $('sb2').onclick=doShare;
   $('tg').onclick=function(){$('fm').hidden=!$('fm').hidden};
   $('cb').onclick=doClaim}
- function viaLink(){
-  var e=$('se'),fb='https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url)+'&quote='+encodeURIComponent(cap)+'&hashtag='+encodeURIComponent('#9sach'),w=null;
+ /* dự phòng cuối: tải ảnh + sao chép caption, khách tự đăng */
+ function viaSave(){
+  var e=$('se');
   if(blob){try{var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=FILE;document.body.appendChild(a);a.click();a.remove()}catch(x){}}
-  try{w=window.open(fb,'_blank')}catch(x){}
-  e.innerHTML='Đã sao chép caption'+(blob?' và tải ảnh về máy':'')+'. '+(w?'':'<a href="'+fb+'" target="_blank" rel="noopener" style="color:#1877f2;font-weight:800">Bấm đây để mở Facebook</a>. ')+'Trên Facebook: đính kèm ảnh vừa tải (hoặc giữ ảnh ở trên để lưu), dán caption rồi đăng.'}
+  e.textContent='Đã sao chép caption'+(blob?' và tải ảnh về máy':'')+'. Mở Facebook, tạo bài viết, chọn ảnh vừa tải, dán caption rồi đăng.'}
+ /* khung nhúng chặn menu chia sẻ: mở share.html ở thẻ mới (mở NGAY trong lúc bấm để không bị chặn popup), chuyển ảnh + caption sang bằng postMessage */
+ function viaTab(){
+  var e=$('se'),w=null,data=null,ready=false,sent=false;
+  if(!blob){viaSave();return}
+  try{w=window.open(new URL('share.html?v=1',location.href).href,'_blank')}catch(x){}
+  if(!w){viaSave();return}
+  function send(){if(sent||!data||!ready)return;sent=true;try{w.postMessage({t:'dcshare',img:data,cap:cap,name:FILE},'*')}catch(x){viaSave()}}
+  window.addEventListener('message',function(ev){if(ev.source===w&&ev.data&&ev.data.t==='dcshare-ready'){ready=true;send()}});
+  var rd=new FileReader();rd.onload=function(){data=rd.result;send()};rd.readAsDataURL(blob);
+  e.textContent='Đã mở trang chia sẻ ở thẻ mới: bấm nút CHIA SẺ LÊN FACEBOOK ở đó. Caption và hashtag đã sao chép sẵn.'}
  function doShare(){
   var e=$('se');copyText(cap);
   var f=null,can=false;
   try{if(blob)f=new File([blob],FILE,{type:'image/jpeg'})}catch(x){}
   try{can=!!(f&&navigator.share&&navigator.canShare&&navigator.canShare({files:[f]}))}catch(x){}
   if(can){
-   e.textContent='Đã sao chép caption. Chọn Facebook, dán caption rồi bấm Đăng.';
-   navigator.share({files:[f],text:cap}).catch(function(x){if(x&&x.name==='AbortError')return;viaLink()});return}
-  viaLink()}
+   e.textContent='Đã sao chép caption. Chọn Facebook, dán caption (nếu chưa tự có) rồi bấm Đăng.';
+   navigator.share({files:[f],text:cap}).catch(function(x){if(x&&x.name==='AbortError')return;viaSave()});return}
+  viaTab()}
  function doClaim(){
   var ten=$('cn').value.trim().replace(/\s+/g,' '),sdt=$('cp').value.replace(/[^0-9]/g,''),e=$('ce'),btn=$('cb');
   if(ten.length<2){e.textContent='Vui lòng nhập họ tên';return}
