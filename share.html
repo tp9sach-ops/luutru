@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang='vi'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='robots' content='noindex'><title>Chia sẻ khoảnh khắc về nhất – 9 Sạch</title>
+<style>
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;text-align:center;color:#fff;font-family:'Be Vietnam Pro',system-ui,sans-serif;background:radial-gradient(ellipse at 50% 0,#1b7a55 0,#0d4a36 52%,#041a12 100%)}
+h2{margin:0 0 10px;color:#ffd27a;font-size:22px}
+img{width:100%;max-width:340px;border-radius:14px;border:3px solid #ffd05a;box-shadow:0 10px 26px rgba(0,0,0,.4);display:none}
+p{font-size:14px;margin:10px 0;max-width:340px;color:#d9f2e4}
+button{display:block;width:100%;max-width:340px;margin:8px auto 0;font:inherit;font-size:18px;font-weight:800;border:0;border-radius:16px;padding:14px;cursor:pointer}
+#sh{background:#1877f2;color:#fff}#dl{background:#fff;color:#7a0a1c}
+#ms{min-height:20px;color:#ffe08a;font-weight:700}
+</style></head><body>
+<h2>🐯 Khoảnh khắc về nhất</h2>
+<img id='im' alt=''>
+<p id='ms'>Đang nhận ảnh…</p>
+<button id='sh' hidden>📣 CHIA SẺ LÊN FACEBOOK</button>
+<button id='dl' hidden>💾 Lưu ảnh về máy</button>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)},file=null,cap='',name='duongduaquagiangsinh.jpg',got=0;
+function copy(t){try{var ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;left:-9999px;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}catch(e){}try{navigator.clipboard&&navigator.clipboard.writeText(t).catch(function(){})}catch(e){}}
+window.addEventListener('message',function(ev){
+ var d=ev.data;if(!d||d.t!=='dcshare'||got)return;got=1;cap=d.cap||'';name=d.name||name;
+ $('im').src=d.img;$('im').style.display='block';
+ fetch(d.img).then(function(r){return r.blob()}).then(function(b){
+  file=new File([b],name,{type:'image/jpeg'});
+  $('ms').textContent='Bấm nút bên dưới, chọn Facebook. Caption và hashtag đã được sao chép sẵn.';
+  $('sh').hidden=false;$('dl').hidden=false;copy(cap)
+ }).catch(function(){$('ms').textContent='Không đọc được ảnh, vui lòng quay lại trò chơi và thử lại'});
+});
+$('sh').onclick=function(){
+ copy(cap);
+ var ok=false;try{ok=!!(file&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]}))}catch(e){}
+ if(ok){navigator.share({files:[file],text:cap}).catch(function(x){if(x&&x.name==='AbortError')return;$('ms').textContent='Máy chưa mở được menu chia sẻ, hãy bấm Lưu ảnh rồi đăng thủ công (caption đã sao chép).'});$('ms').textContent='Chọn Facebook, dán caption (nếu chưa tự có) rồi bấm Đăng.'}
+ else $('ms').textContent='Trình duyệt này không hỗ trợ chia sẻ kèm ảnh. Bấm Lưu ảnh, mở Facebook, chọn ảnh và dán caption (đã sao chép).';
+};
+$('dl').onclick=function(){if(!file)return;var a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();a.remove();copy(cap);$('ms').textContent='Đã lưu ảnh và sao chép caption. Mở Facebook, chọn ảnh vừa lưu, dán caption rồi đăng.'};
+if(window.opener){try{window.opener.postMessage({t:'dcshare-ready'},'*')}catch(e){}}
+else $('ms').textContent='Hãy mở trang này từ nút chia sẻ sau khi đua xong.';
+})();
+</script></body></html>
