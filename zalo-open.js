@@ -65,7 +65,7 @@
 
   function showShare() {
     var h = document.querySelector('#rs .box h1'), prize = h ? h.textContent.trim() : '',
-      cap = 'Mình vừa về nhất Đường Đua Quà Giáng Sinh của 9 Sạch và trúng ' + prize + '! 🐯🎄\n#9sach #banhsaurieng9sach #duacop #duongduaquagiangsinh';
+      cap = window.DCcap ? window.DCcap(prize) : ('Mình vừa về nhất THÊM 1K - ĐUA NGAY NHẬN QUÀ của 9 Sạch và trúng ' + prize + '! 🐯🎁\n#9sach #banhsaurieng9sach #duacop #them1k #duangaynhanqua');
     copyText(cap);
     var box = shell('📣', 'Zalo chưa chia sẻ được lên Facebook', 'Caption đã được <b>sao chép</b>. Nhấn giữ ảnh chiến thắng → <b>Lưu ảnh</b>. Sau đó mở <b>Facebook</b> → Tạo bài viết → chọn ảnh → dán caption → Đăng. Lần sau hãy mở link bằng trình duyệt để chia sẻ 1 chạm nhé.');
     var b = mk('button', GOLD, 'Đã hiểu'); b.type = 'button'; b.onclick = close; box.appendChild(b);

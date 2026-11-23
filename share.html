@@ -5,7 +5,9 @@ h2{margin:0 0 10px;color:#ffd27a;font-size:22px}
 img{width:100%;max-width:340px;border-radius:14px;border:3px solid #ffd05a;box-shadow:0 10px 26px rgba(0,0,0,.4);display:none}
 p{font-size:14px;margin:10px 0;max-width:340px;color:#d9f2e4}
 button{display:block;width:100%;max-width:340px;margin:8px auto 0;font:inherit;font-size:18px;font-weight:800;border:0;border-radius:16px;padding:14px;cursor:pointer}
-#sh{background:#1877f2;color:#fff}#dl{background:#fff;color:#7a0a1c}
+#sh{background:#1877f2;color:#fff}#dl{background:#fff;color:#7a0a1c}#cb{background:linear-gradient(#ffd95a,#ffb300);color:#7a0a1c}
+#cbx{display:none;width:100%;max-width:340px;margin-top:12px;text-align:left}#cbx b{color:#ffd27a;font-size:14px}
+#ct{display:block;width:100%;box-sizing:border-box;margin-top:6px;font:inherit;font-size:14px;line-height:1.45;color:#3b1d0a;background:#fffaf0;border:3px solid #ffd27a;border-radius:12px;padding:10px;resize:none}
 #ms{min-height:20px;color:#ffe08a;font-weight:700}
 </style></head><body>
 <h2>🐯 Khoảnh khắc về nhất</h2>
@@ -13,25 +15,27 @@ button{display:block;width:100%;max-width:340px;margin:8px auto 0;font:inherit;f
 <p id='ms'>Đang nhận ảnh…</p>
 <button id='sh' hidden>📣 CHIA SẺ LÊN FACEBOOK</button>
 <button id='dl' hidden>💾 Lưu ảnh về máy</button>
+<div id='cbx'><b>📝 Caption bài đăng (Facebook không tự điền)</b><textarea id='ct' readonly rows='7'></textarea><button id='cb' type='button'>📋 SAO CHÉP CAPTION</button><p style='margin:8px 0 0;font-size:13px'>Trên Facebook: nhấn giữ ô viết bài → chọn <b>Dán</b> → Đăng.</p></div>
 <script>
 (function(){
-var $=function(i){return document.getElementById(i)},file=null,cap='',name='duongduaquagiangsinh.jpg',got=0;
+var $=function(i){return document.getElementById(i)},file=null,cap='',name='them1k-duangaynhanqua.jpg',got=0;
 function copy(t){try{var ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;left:-9999px;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}catch(e){}try{navigator.clipboard&&navigator.clipboard.writeText(t).catch(function(){})}catch(e){}}
 window.addEventListener('message',function(ev){
  var d=ev.data;if(!d||d.t!=='dcshare'||got)return;got=1;cap=d.cap||'';name=d.name||name;
  $('im').src=d.img;$('im').style.display='block';
  fetch(d.img).then(function(r){return r.blob()}).then(function(b){
   file=new File([b],name,{type:'image/jpeg'});
-  $('ms').textContent='Bấm nút bên dưới, chọn Facebook. Caption và hashtag đã được sao chép sẵn.';
-  $('sh').hidden=false;$('dl').hidden=false;copy(cap)
+  $('ms').textContent='Bấm CHIA SẺ, chọn Facebook. Facebook không tự điền caption: nhấn giữ ô viết bài → Dán (hoặc bấm Sao chép caption bên dưới).';
+  $('sh').hidden=false;$('dl').hidden=false;$('cbx').style.display='block';$('ct').value=cap;copy(cap)
  }).catch(function(){$('ms').textContent='Không đọc được ảnh, vui lòng quay lại trò chơi và thử lại'});
 });
 $('sh').onclick=function(){
  copy(cap);
  var ok=false;try{ok=!!(file&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]}))}catch(e){}
- if(ok){navigator.share({files:[file],text:cap}).catch(function(x){if(x&&x.name==='AbortError')return;$('ms').textContent='Máy chưa mở được menu chia sẻ, hãy bấm Lưu ảnh rồi đăng thủ công (caption đã sao chép).'});$('ms').textContent='Chọn Facebook, dán caption (nếu chưa tự có) rồi bấm Đăng.'}
+ if(ok){navigator.share({files:[file],text:cap}).catch(function(x){if(x&&x.name==='AbortError')return;$('ms').textContent='Máy chưa mở được menu chia sẻ, hãy bấm Lưu ảnh rồi đăng thủ công (caption đã sao chép).'});$('ms').textContent='Chọn Facebook, nhấn giữ ô viết bài → Dán caption rồi bấm Đăng.'}
  else $('ms').textContent='Trình duyệt này không hỗ trợ chia sẻ kèm ảnh. Bấm Lưu ảnh, mở Facebook, chọn ảnh và dán caption (đã sao chép).';
 };
+$('cb').onclick=function(){copy(cap);try{$('ct').focus();$('ct').select();$('ct').setSelectionRange(0,cap.length)}catch(e){}$('cb').textContent='✅ ĐÃ SAO CHÉP – dán vào bài đăng'};
 $('dl').onclick=function(){if(!file)return;var a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();a.remove();copy(cap);$('ms').textContent='Đã lưu ảnh và sao chép caption. Mở Facebook, chọn ảnh vừa lưu, dán caption rồi đăng.'};
 if(window.opener){try{window.opener.postMessage({t:'dcshare-ready'},'*')}catch(e){}}
 else $('ms').textContent='Hãy mở trang này từ nút chia sẻ sau khi đua xong.';
