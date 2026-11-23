@@ -47,3 +47,7 @@
 
 /* v21: số 1 trong "1K" bị nhỏ như chữ thường vì font Playfair mặc định dùng số kiểu cũ (old-style) -> ép dùng số cùng chiều cao với chữ hoa */
 #gate h2,.ttl,.cd,.mc,.box h1{font-variant-numeric:lining-nums;-webkit-font-feature-settings:'lnum' 1;font-feature-settings:'lnum' 1}
+
+/* v22: premium.css (nạp SAU flow.css) đặt .btn{position:relative;height:56px} đè lên .gostart nên nút BẮT ĐẦU bị đẩy lên mép trên sân đua và bị cắt. Tăng độ ưu tiên (.stage .gostart + !important) để nút luôn nằm tuyệt đối giữa sân, hơi thấp hơn tâm. */
+.stage .gostart{position:absolute!important;left:50%!important;top:60%!important;right:auto!important;bottom:auto!important;margin:0!important;width:min(80%,320px)!important;height:auto!important;z-index:7;overflow:visible}
+.stage .gostart[hidden]{display:none!important}
