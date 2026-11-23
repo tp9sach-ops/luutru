@@ -31,8 +31,8 @@
 #gate h2.gname{font-size:clamp(24px,7.4vw,44px)!important;line-height:1.12}
 #gate h2.gname span{display:inline-block}
 .ttl{font-size:clamp(14px,4.3vw,26px)!important;line-height:1.12!important}
-/* v20: nút BẮT ĐẦU ĐUA nằm giữa sân đua, chờ người chơi bấm rồi mới đếm 3-2-1 */
-.gostart{position:absolute;left:50%;top:50%;width:min(80%,320px);margin:0;z-index:7;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);animation:gostart 1.1s ease-in-out infinite;font-size:clamp(20px,6vw,28px);height:auto;padding:16px 14px}
+/* v20: nút BẮT ĐẦU ĐUA nằm giữa sân đua, chờ người chơi bấm rồi mới đếm 3-2-1 (v21: dời xuống top:60% cho cân đối, dễ thấy hơn) */
+.gostart{position:absolute;left:50%;top:60%;width:min(80%,320px);margin:0;z-index:7;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);animation:gostart 1.1s ease-in-out infinite;font-size:clamp(20px,6vw,28px);height:auto;padding:16px 14px}
 .gostart[hidden]{display:none}
 .gostart:active{-webkit-transform:translate(-50%,-47%);transform:translate(-50%,-47%)}
 @keyframes gostart{50%{-webkit-transform:translate(-50%,-50%) scale(1.07);transform:translate(-50%,-50%) scale(1.07)}}
@@ -44,3 +44,6 @@
 #rs .capbox textarea{display:block;width:100%;box-sizing:border-box;font:inherit;font-size:14px;line-height:1.45;color:#3b1d0a;background:#fffaf0;border:3px solid #ffd27a;border-radius:12px;padding:10px;resize:none}
 #rs .capbox .capb{height:46px;font-size:16px;margin-top:8px}
 #rs .caph2{font-size:13px;margin:6px 2px 0}
+
+/* v21: số 1 trong "1K" bị nhỏ như chữ thường vì font Playfair mặc định dùng số kiểu cũ (old-style) -> ép dùng số cùng chiều cao với chữ hoa */
+#gate h2,.ttl,.cd,.mc,.box h1{font-variant-numeric:lining-nums;-webkit-font-feature-settings:'lnum' 1;font-feature-settings:'lnum' 1}

@@ -1,4 +1,5 @@
-/* v47: ảnh ghép = cọp chạm đích + HÌNH QUÀ (thay bục 1-2-3); caption mới hào hứng (window.DCcap) và HIỂN THỊ trong hộp caption + nút Sao chép (iOS/Facebook bỏ qua text khi chia sẻ ảnh nên trước đây khách không thấy caption). Tên mới THÊM 1K - ĐUA NGAY NHẬN QUÀ.
+/* v48: caption đổi sang LỜI CỦA KHÁCH chơi (ngôi "mình"), không còn là lời quảng cáo của 9 Sạch.
+   v47: ảnh ghép = cọp chạm đích + HÌNH QUÀ (thay bục 1-2-3); caption mới hào hứng (window.DCcap) và HIỂN THỊ trong hộp caption + nút Sao chép (iOS/Facebook bỏ qua text khi chia sẻ ảnh nên trước đây khách không thấy caption). Tên mới THÊM 1K - ĐUA NGAY NHẬN QUÀ.
    v46: KHÔNG gửi link nữa. Nút chia sẻ: (1) máy cho phép -> menu chia sẻ của máy kèm ảnh + caption; (2) khung nhúng (Google Sites) chặn menu chia sẻ -> mở share.html ở THẺ MỚI (không bị khung chặn), ảnh + caption được chuyển sang bằng postMessage, khách bấm nút ở đó để mở menu chia sẻ kèm ảnh; (3) popup bị chặn -> tải ảnh về + sao chép caption.
    v44: ảnh tải về tên duongduaquagiangsinh.jpg. v42: không còn đăng nhập Facebook. Dự phòng: nhập Họ tên + SĐT để nhân viên trao quà (claim như cũ). */
 try{window.CFG=window.CFG||{};window.CFG.FB_APP_ID=''}catch(e){}
@@ -11,8 +12,8 @@ function $(i){return document.getElementById(i)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function loadImg(src){return new Promise(function(ok){if(!src)return ok(null);var im=new Image();im.onload=function(){ok(im)};im.onerror=function(){ok(null)};im.src=src})}
 function cover(x,im,X,Y,W,H){var k=Math.max(W/im.width,H/im.height),w=im.width*k,h=im.height*k;x.save();x.beginPath();x.rect(X,Y,W,H);x.clip();x.drawImage(im,X+(W-w)/2,Y+(H-h)/2,w,h);x.restore()}
-/* caption chia sẻ (dùng chung: share-fix.js, zalo-open.js) */
-window.DCcap=function(prize){return '🐯🔥 THÊM 1K - ĐUA NGAY NHẬN QUÀ! 🎁\nCọp của mình vừa vọt lên VỀ NHẤT và rinh ngay '+prize+' từ 9 Sạch! 🏆🎉\nMỗi chú cọp đội một món quà, cọp nào về đích trước là quà đó thuộc về bạn. Hồi hộp, vui và có quà thật! 🍰💛\n👉 Hóa đơn từ 159k tại 9 Sạch là được tham gia đua ngay. Bạn dám thử vận may không?\n'+HASH};
+/* caption chia sẻ (dùng chung: share-fix.js, zalo-open.js): viết bằng lời của KHÁCH chơi (ngôi 'mình'), không phải lời của 9 Sạch */
+window.DCcap=function(prize){return '🐯🏆 Mình vừa chơi THÊM 1K - ĐUA NGAY NHẬN QUÀ ở 9 Sạch và cọp của mình về NHẤT, rinh ngay '+prize+' luôn nè! 🎁🎉\nHồi hộp muốn nổ tim, cọp nào đội quà về đích trước là quà đó thuộc về mình thật luôn! 🔥\n👉 Ai có hóa đơn từ 159k tại 9 Sạch là được đua, mọi người thử vận may như mình đi nha! 😍\n'+HASH};
 function loadGift(src){return new Promise(function(ok){if(!src)return ok(null);var im=new Image();if(!/^data:/.test(src))im.crossOrigin='anonymous';im.onload=function(){ok(im)};im.onerror=function(){ok(null)};im.src=src})}
 function fitText(x,txt,wt,max,maxW){var s=max;do{x.font=wt+' '+s+'px "Be Vietnam Pro",sans-serif';s-=2}while(s>20&&x.measureText(txt).width>maxW)}
 function rrect(x,X,Y,W,H,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+W,Y,X+W,Y+H,r);x.arcTo(X+W,Y+H,X,Y+H,r);x.arcTo(X,Y+H,X,Y,r);x.arcTo(X,Y,X+W,Y,r);x.closePath()}
