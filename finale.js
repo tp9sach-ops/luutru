@@ -1,4 +1,5 @@
-/* FINALE v2 – màn về đích kiểu TVC: (1) cọp chạy về đích BÌNH THƯỜNG, đợi mọi cọp về xong; (2) sau đó PHÁT LẠI CHẬM (replay, 0,4x) khoảnh khắc cọp thắng chạm dây đích, camera thấp ở mép đường đua phía trước vạch, đẩy dần + thu hẹp góc, thấy cả vài cọp về sát phía sau, dây đích đứt khi chạm, chụp khung hình đó; (3) bục vinh quang 1-2-3 bằng cọp 3D cầm chai bắn bọt, chụp khung hình bục; (4) lưu ảnh vào FIN.snaps để share-fix.js ghép ảnh chia sẻ Facebook.
+/* FINALE v3 – màn về đích kiểu TVC: (1) cọp chạy về đích BÌNH THƯỜNG, đợi mọi cọp về xong; (2) sau đó PHÁT LẠI CHẬM (replay, 0,4x) khoảnh khắc cọp thắng chạm dây đích, camera thấp ở mép đường đua phía trước vạch, đẩy dần + thu hẹp góc, thấy cả vài cọp về sát phía sau, dây đích đứt khi chạm, chụp khung hình đó; (3) bục vinh quang 1-2-3 bằng cọp 3D cầm chai bắn bọt, chụp khung hình bục; (4) lưu ảnh vào FIN.snaps để share-fix.js ghép ảnh chia sẻ Facebook.
+   v3: SỬA cọp bị kéo lê trong replay: lúc replay mỗi khung ép tốc độ chân (l.kk) = tốc độ thật tại thời điểm phát lại (trước đây chân làm mượt từ 0 nên đứng yên), và khôi phục pha chân (l.ph) trước khi tạo dáng để lần tạo dáng của game cùng khung không làm chân chạy gấp đôi.
    v2: bỏ quay chậm TRƯỚC khi về đích (SLOWMO.s=1); replay dựng lại vị trí từ plan.tab nên tái hiện đúng cuộc đua.
    Nạp TRƯỚC loader.js. Móc vào game.js qua patches-fix.js: DC.x() (lấy biến trong game), FIN.tick() (sau relab mỗi khung hình), FIN.pw() (tư thế ăn mừng), FIN.finDelay() (chờ hết replay + cảnh bục mới hiện bảng chúc mừng).
    Mọi lỗi trong FIN.tick đều bị bắt: hỏng phần này thì game vẫn chạy như cũ. */
@@ -82,7 +83,13 @@
     X.LN.forEach(function (l, i) {
       var p = prg(pl, i, tr), p2 = prg(pl, i, tr + .06), th = TH0 - p * TOTA, r = RM + (i - (n - 1) / 2) * LS,
         v = Math.max(0, Math.min(1.3, (p2 - p) / .06 * X.DUR * .9));
-      if (window.TR && l.tg && l.tg.rig) TR.pose(l, 0, v, dt * REP.s, i, tr, { state: 'race', tm: now / 1000, win: -1, mid: false, fall: -1 });
+      if (window.TR && l.tg && l.tg.rig) {
+        /* khôi phục pha chân của khung trước (lần tạo dáng của game trong cùng khung đã cộng thêm), ép tốc độ chân = tốc độ thật */
+        if (l.__ph !== undefined) l.ph = l.__ph;
+        l.kk = v; l.rd = 0;
+        TR.pose(l, 0, v, dt * REP.s, i, tr, { state: 'race', tm: now / 1000, win: -1, mid: false, fall: -1 });
+        l.__ph = l.ph;
+      }
       l.th = th; l.v = v;
       l.ln.position.set(Math.cos(th) * r, 0, Math.sin(th) * r);
       l.ln.rotation.y = Math.PI / 2 - th;
