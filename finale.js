@@ -1,18 +1,24 @@
-/* FINALE v1 – màn về đích kiểu TVC: (1) quay chậm cận cảnh cọp chạm vạch đích, chụp khung hình đẹp; (2) sau khi mọi cọp về đích: bục vinh quang 1-2-3 bằng cọp 3D đứng trên bục, mỗi cọp cầm chai bắn bọt ăn mừng, chụp khung hình bục; (3) lưu ảnh vào FIN.snaps để share-fix.js ghép ảnh chia sẻ Facebook.
-   Nạp TRƯỚC loader.js. Móc vào game.js qua patches-fix.js: DC.x() (lấy biến trong game), FIN.tick() (sau relab mỗi khung hình), FIN.pw() (tư thế ăn mừng), FIN.finDelay() (chờ hết cảnh bục mới hiện bảng chúc mừng).
+/* FINALE v2 – màn về đích kiểu TVC: (1) cọp chạy về đích BÌNH THƯỜNG, đợi mọi cọp về xong; (2) sau đó PHÁT LẠI CHẬM (replay, 0,4x) khoảnh khắc cọp thắng chạm dây đích, camera thấp ở mép đường đua phía trước vạch, đẩy dần + thu hẹp góc, thấy cả vài cọp về sát phía sau, dây đích đứt khi chạm, chụp khung hình đó; (3) bục vinh quang 1-2-3 bằng cọp 3D cầm chai bắn bọt, chụp khung hình bục; (4) lưu ảnh vào FIN.snaps để share-fix.js ghép ảnh chia sẻ Facebook.
+   v2: bỏ quay chậm TRƯỚC khi về đích (SLOWMO.s=1); replay dựng lại vị trí từ plan.tab nên tái hiện đúng cuộc đua.
+   Nạp TRƯỚC loader.js. Móc vào game.js qua patches-fix.js: DC.x() (lấy biến trong game), FIN.tick() (sau relab mỗi khung hình), FIN.pw() (tư thế ăn mừng), FIN.finDelay() (chờ hết replay + cảnh bục mới hiện bảng chúc mừng).
    Mọi lỗi trong FIN.tick đều bị bắt: hỏng phần này thì game vẫn chạy như cũ. */
 (function () {
   'use strict';
-  var S = { pl: null, pod: null, bars: 0 };
+  var S = { pl: null, pod: null, bars: 0, rep: null };
+  /* replay: a = giây trước DUR bắt đầu phát lại, b = giây sau DUR kết thúc, s = tốc độ (0,4 = chậm còn 40%) */
+  var REP = { a: 1.4, b: .8, s: .4 };
+  function repLen() { return (REP.a + REP.b) / REP.s; }
+  function t0Of(p) { return p.mx + .8; }
+  function tpOf(p) { return t0Of(p) + repLen() + .15; }
   var FIN = window.FIN = {
     snaps: {},
     /* thời gian (giây) kể từ lúc lên bục của cọp hạng nhất/nhì/ba; -1 nếu không phải */
     pw: function (i) { var p = S.pod; return (p && p.on && p.rk.indexOf(i) >= 0) ? Math.max(0, p.q) : -1; },
-    /* chờ bao lâu (ms) từ lúc celebrate() tới khi hiện bảng chúc mừng: hết cảnh bục */
+    /* chờ bao lâu (ms) từ lúc celebrate() tới khi hiện bảng chúc mừng: hết replay + cảnh bục */
     finDelay: function () {
       try {
         var p = window.DC.x().plan, rt = (performance.now() - p.t0) / 1000;
-        return Math.max(2500, Math.round((p.mx + 1.9 + 5.6 - rt) * 1000));
+        return Math.max(2500, Math.round((tpOf(p) + 5.6 - rt) * 1000));
       } catch (e) { return 3400; }
     },
     tick: function (now, dt) {
@@ -42,13 +48,72 @@
     }
   }
 
-  /* camera A: thấp, đặt phía trước vạch đích nhìn thẳng vào cọp lao tới, cọp chạm vạch giữa khung */
-  function camA(X, pl, rt) {
-    var L = X.LN[pl.W], wo = L.ln.position, r = Math.sqrt(wo.x * wo.x + wo.z * wo.z) || X.RM,
-      thF = X.TH0 - X.TOTA - 1.2 / X.RM, thC = thF - 12 / r, asp = X.fw && X.fh ? X.fw / X.fh : 1.6, C = X.C, fov = asp < 1 ? 36 : 30;
-    C.position.set(Math.cos(thC) * (r - .7), 1.5 + Math.sin(rt * 3) * .03, Math.sin(thC) * (r - .7));
-    C.lookAt(wo.x, 2.7, wo.z);
-    if (Math.abs(C.fov - fov) > .05) { C.fov = fov; C.updateProjectionMatrix(); }
+  /* tiến độ (0..1) của cọp i tại thời gian t trên đồng hồ cuộc đua: giống hàm pr() trong game */
+  function prg(pl, i, t) {
+    var T = pl.tab[i], x = t / T.dt, k = x | 0;
+    if (x <= 0) return 0;
+    if (k >= T.n - 1) return T.c[T.n - 1];
+    return T.c[k] + (T.c[k + 1] - T.c[k]) * (x - k);
+  }
+
+  function ease(u) { u = Math.max(0, Math.min(1, u)); return u * u * (3 - 2 * u); }
+
+  /* REPLAY: q = giây thật kể từ lúc bắt đầu phát lại */
+  function replay(X, pl, q, now, dt) {
+    var TH = window.THREE, n = X.LN.length, TH0 = X.TH0, TOTA = X.TOTA, RM = X.RM, LS = 2.7, RI = 14,
+      tr = X.DUR - REP.a + q * REP.s, U = Math.max(0, Math.min(1, q / repLen())), C = X.C, W = pl.W,
+      thF = TH0 - TOTA - 1.2 / RM, asp = X.fw && X.fh ? X.fw / X.fh : 1.6;
+    if (!S.rep) {
+      var Lw = n * LS + 1, tp = new TH.Group(), m1 = new TH.Mesh(new TH.BoxGeometry(.05, .13, Lw), new TH.MeshBasicMaterial({ color: 0xd8132f })),
+        m2 = new TH.Mesh(new TH.BoxGeometry(.05, .13, Lw), new TH.MeshBasicMaterial({ color: 0xffffff }));
+      m1.position.y = 1.75; m2.position.y = 1.58; tp.add(m1); tp.add(m2);
+      tp.position.set(Math.cos(thF) * RM, 0, Math.sin(thF) * RM); tp.rotation.y = Math.PI / 2 - thF;
+      X.S.add(tp);
+      var cap = document.createElement('div');
+      cap.style.cssText = 'position:absolute;left:0;right:0;bottom:8.5%;text-align:center;color:#ffe9a8;font:800 13px "Be Vietnam Pro",sans-serif;letter-spacing:.3em;text-shadow:0 2px 6px #000;z-index:3;pointer-events:none';
+      cap.textContent = 'KHOẢNH KHẮC CHẠM ĐÍCH';
+      X.TV.appendChild(cap);
+      S.rep = { tape: tp, cap: cap, cut: 0 };
+      S.bars = 1; showBars(X);
+      try { X.beep(330, .25); } catch (e) {}
+    }
+    S.rep.cap.style.display = 'block';
+    /* dựng lại vị trí + dáng chạy của mọi cọp ở thời điểm tr (chạy chậm theo REP.s) */
+    X.LN.forEach(function (l, i) {
+      var p = prg(pl, i, tr), p2 = prg(pl, i, tr + .06), th = TH0 - p * TOTA, r = RM + (i - (n - 1) / 2) * LS,
+        v = Math.max(0, Math.min(1.3, (p2 - p) / .06 * X.DUR * .9));
+      if (window.TR && l.tg && l.tg.rig) TR.pose(l, 0, v, dt * REP.s, i, tr, { state: 'race', tm: now / 1000, win: -1, mid: false, fall: -1 });
+      l.th = th; l.v = v;
+      l.ln.position.set(Math.cos(th) * r, 0, Math.sin(th) * r);
+      l.ln.rotation.y = Math.PI / 2 - th;
+      if (l.sp) l.sp.visible = false;
+    });
+    /* dây đích đứt khi cọp thắng chạm vạch + chụp khung hình đẹp */
+    var thW = TH0 - prg(pl, W, tr) * TOTA;
+    if (!S.rep.cut && thW <= thF) {
+      S.rep.cut = 1; S.rep.tape.visible = false;
+      var wp0 = X.LN[W].ln.position;
+      burst(X, wp0.x, 2.2, wp0.z, X.CCOL[(Math.random() * X.CCOL.length) | 0]);
+      burst(X, wp0.x, 2.6, wp0.z, X.CCOL[(Math.random() * X.CCOL.length) | 0]);
+      snapReq('fin');
+    }
+    /* camera nghệ thuật: thấp, ở mép đường đua phía trước vạch, nhìn chéo vào cọp thắng, đẩy dần vào + thu hẹp góc */
+    var rW = RM + (W - (n - 1) / 2) * LS, Ro = RI + n * LS, out = W >= (n - 1) / 2, rc = out ? Ro + 3.6 : RI - 2.2,
+      d = (asp < 1 ? 17 - 6 * ease(U) : 13 - 5.5 * ease(U)), thC = thF - d / RM, h = 1.0 + .7 * ease(U),
+      wp = X.LN[W].ln.position, bl = .5 * ease(U + .15),
+      lx = Math.cos(thF) * rW, lz = Math.sin(thF) * rW,
+      fov = (asp < 1 ? 50 : 34) * (1 - .15 * ease(U));
+    C.position.set(Math.cos(thC) * rc, h, Math.sin(thC) * rc);
+    C.lookAt(lx + (wp.x - lx) * bl, 2.0, lz + (wp.z - lz) * bl);
+    if (Math.abs(C.fov - fov) > .02) { C.fov = fov; C.updateProjectionMatrix(); }
+  }
+
+  function endRep(X) {
+    var R = S.rep; if (!R) return;
+    try { X.S.remove(R.tape); } catch (e) {}
+    R.cap.style.display = 'none';
+    S.rep = null; S.repDone = 1;
+    if (S.bars === 1) { S.bars = 2; X.hideTvc(); }
   }
 
   function numTex(TH, txt) {
@@ -135,29 +200,22 @@
     if (q >= 3.2) snapReq('pod');
   }
 
-  function run(now) {
-    var SM = window.SLOWMO; if (SM) { SM.a = .8; SM.b = .4; SM.s = .34; }
+  function run(now, dt) {
+    /* tắt quay chậm cũ TRƯỚC khi về đích (s=1: không kéo giãn thời gian); replay chạy ở đây sau khi mọi cọp về xong */
+    var SM = window.SLOWMO; if (SM) { SM.a = .8; SM.b = .4; SM.s = 1; }
     if (!window.DC || !window.DC.x) return;
     var X = window.DC.x(), pl = X.plan;
     if (!pl || !X.LN.length) return;
-    if (S.pl !== pl) { S = { pl: pl, pod: null, bars: 0 }; FIN.snaps = {}; }
+    if (S.pl !== pl) { S = { pl: pl, pod: null, bars: 0, rep: null }; FIN.snaps = {}; }
     if (X.state !== 'race' && X.state !== 'done') return;
     snapGet();
-    var rt = (now - pl.t0) / 1000, DUR = X.DUR, a = SM ? SM.a : .8, b = SM ? SM.b : .4,
-      podOn = !!(S.pod && S.pod.on), inWin = rt > DUR - a - .02 && rt < DUR + b + .15;
-    if (inWin && !podOn) {
-      if (S.bars !== 1) { S.bars = 1; showBars(X); }
-      camA(X, pl, rt);
-      if (rt >= DUR + .05) {
-        if (!S.rq_fin) {
-          var Lw = X.LN[pl.W].ln.position;
-          burst(X, Lw.x, 3, Lw.z, X.CCOL[(Math.random() * X.CCOL.length) | 0]);
-        }
-        snapReq('fin');
-      }
-    } else if (!inWin && S.bars === 1) { S.bars = 2; X.hideTvc(); }
-    var Tp = pl.mx + 1.9;
-    if (rt >= Tp && !S.pod) buildPod(X, pl, rt);
+    var rt = (now - pl.t0) / 1000, T0 = t0Of(pl), Tp = tpOf(pl), podOn = !!(S.pod && S.pod.on);
+    dt = dt || .016;
+    if (!podOn && !S.repFail && rt >= T0 && rt < Tp - .15) {
+      try { replay(X, pl, rt - T0, now, dt); } catch (e) { S.repFail = 1; try { endRep(X); console.warn('replay', e); } catch (_) {} }
+    } else if (S.rep) { endRep(X); }
+    var TpUse = S.repFail ? T0 + 1.1 : Tp;
+    if (rt >= TpUse && !S.pod) buildPod(X, pl, rt);
     if (S.pod && S.pod.on) podTick(X, pl, rt, now);
   }
 })();
