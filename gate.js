@@ -1,5 +1,5 @@
 /* Cổng vào game: chọn cửa hàng (tìm kiếm) + số hóa đơn -> đua; sau khi đua trúng quà mới nhập tên + SĐT. Cần window.DC do flow-patch.js tạo trong game.js. */
-/* v6: nền xanh như cũ; thêm vật phẩm ĐỎ Noel làm điểm nhấn (không đổi nền): viền kẹo gậy, dây đèn bóng đỏ + nơ + quả ô rô, hộp quà đỏ, kẹo gậy, cây thông có ruy băng và bóng đỏ. Cọp lặp chu kỳ 10 s: chạy bộ tại chỗ (0-3.4 s) -> dừng khởi động xoay cổ tay/cổ chân (4.2-9 s) -> chạy tiếp, không vẫy chào. */
+/* v6: nền xanh như cũ; thêm vật phẩm Đỏ Noel làm điểm nhấn (không đổi nền): viền kẹo gậy, dây đèn bóng đỏ + nơ + quả ô rô, hộp quà đỏ, kẹo gậy, cây thông có ruy băng và bóng đỏ. Cọp lặp chu kỳ 10 s: chạy bộ tại chỗ (0-3.4 s) -> dừng khởi động xoay cổ tay/cổ chân (4.2-9 s) -> chạy tiếp, không vẫy chào. */
 (function(){
 var $=function(i){return document.getElementById(i)},ST='',g=$('gate');
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -102,6 +102,13 @@ gb.addEventListener('click',function(){
   if(m){err(m);gb.disabled=false;gb.textContent='🐯 VÀO ĐUA';return}
   window.__gate=1;g.classList.add('out');setTimeout(function(){if(g.parentNode)g.parentNode.removeChild(g)},700)})});
 gh.addEventListener('keydown',function(e){if(e.key==='Enter')gb.click()});
+/* v35: khóa cửa hàng theo link QR ?ch=<tên cửa hàng>: không cho chọn cửa hàng khác, hết quà thì báo chứ không chuyển sang cửa hàng khác */
+var LK=(function(){try{return new URLSearchParams(location.search).get('ch')||''}catch(e){return ''}})();
+if(LK){var gsr=g.querySelector('.gsr'),gn=document.createElement('div'),sty=document.createElement('style');sty.textContent='#st{display:none!important}';document.head.appendChild(sty);
+ gn.style.cssText='font-weight:800;font-size:19px;color:#ffd27a;margin:2px 0 8px';gn.textContent='🏬 '+LK;gsr.style.display='none';gsr.parentNode.insertBefore(gn,gsr);
+ var lkt=setInterval(function(){var d=D();if(!d||!window.DC)return;clearInterval(lkt);var m=(d.stores||[]).filter(function(s){return fold(s)===fold(LK)})[0];
+  if(!m){err('Link cửa hàng không đúng hoặc cửa hàng chưa mở, vui lòng báo nhân viên');gb.disabled=true;return}
+  gn.textContent='🏬 '+m;ST=m;gs.value=m;if(!has(d,m)){err('Cửa hàng này đã hết quà, xin lỗi bạn');gb.disabled=true;return}window.DC.pick(m)},300)}
 /* Sau khi đua xong: khách đăng nhập Facebook (lấy UID) -> nhận quà -> chia sẻ khoảnh khắc về nhất. Chưa cấu hình CFG.FB_APP_ID thì dùng form tên + SĐT như cũ. */
 /* v7: đăng nhập Facebook bằng CHUYỂN TRANG (không dùng cửa sổ bật lên, tránh trình duyệt di động chặn): bấm nút -> sang facebook.com/dialog/oauth -> quay lại đúng trang này kèm #access_token (xử lý ở cuối file). */
 var HASH='#9sach #banhsaurieng9sach #duacop #duongduaquagiangsinh';
