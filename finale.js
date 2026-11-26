@@ -7,7 +7,7 @@
   'use strict';
   var S = { pl: null, pod: null, bars: 0, rep: null };
   /* replay: a = giây trước DUR bắt đầu phát lại, b = giây sau DUR kết thúc, s = tốc độ (0,4 = chậm còn 40%) */
-  var REP = { a: 1.4, b: .8, s: .4 };
+  var REP = { a: 1.4, b: .8, s: .55 };
   function repLen() { return (REP.a + REP.b) / REP.s; }
   function t0Of(p) { return p.mx + .8; }
   function tpOf(p) { return t0Of(p) + repLen() + .15; }
@@ -19,7 +19,7 @@
     finDelay: function () {
       try {
         var p = window.DC.x().plan, rt = (performance.now() - p.t0) / 1000;
-        return Math.max(2500, Math.round((tpOf(p) + 5.6 - rt) * 1000));
+        return Math.max(2500, Math.round((tpOf(p) + 4.0 - rt) * 1000));
       } catch (e) { return 3400; }
     },
     tick: function (now, dt) {
