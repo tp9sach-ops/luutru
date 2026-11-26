@@ -15,5 +15,18 @@ function startRace(r){RV2=null;`],
 [`SB.classList.add('show')},3200);`,`SB.classList.add('show')},2000);`],
 [`state='warm';res()},4000)})}`,`state='warm';res()},2600)})}`],
 [`k--;setTimeout(step,800)}`,`k--;setTimeout(step,700)}`],
-[`el.hidden=true;res()},500)}})()})}`,`el.hidden=true;res()},400)}})()})}`]
+[`el.hidden=true;res()},500)}})()})}`,`el.hidden=true;res()},400)}})()})}`],
+/* 5) v37: nút BẮT ĐẦU trong màn đua: sau mở đầu, cọp đứng yên chờ; bấm nút mới đếm ngược 3-2-1 rồi cọp chạy (áp cho cả go() và DC.start()) */
+[`function intro(tk){`,`function waitStart(tk){return new Promise(function(res){
+  if(tk!==cdTok)return res();
+  var b=document.getElementById('bd'),iv;
+  if(!b){var st=document.createElement('style');st.textContent='@keyframes bdp{50%{transform:translateX(-50%) scale(1.07)}}#bd{position:fixed;left:50%;bottom:15%;transform:translateX(-50%);z-index:9999;padding:16px 38px;border:0;border-radius:18px;font:800 24px "Baloo 2",system-ui,sans-serif;color:#7a0a1c;background:linear-gradient(#ffd95a,#ffb300);box-shadow:0 6px 0 #b37a00,0 10px 24px #0008;cursor:pointer;touch-action:manipulation;animation:bdp 1.1s infinite;white-space:nowrap}#bd:active{box-shadow:0 2px 0 #b37a00}';document.head.appendChild(st);
+   b=document.createElement('button');b.id='bd';b.type='button';document.body.appendChild(b)}
+  b.textContent='▶ BẮT ĐẦU';b.hidden=false;window.__wt=1;
+  function done(){clearInterval(iv);b.hidden=true;window.__wt=0;b.onclick=null;res()}
+  b.onclick=function(){try{beep(784,.15)}catch(e){}done()};
+  iv=setInterval(function(){if(tk!==cdTok)done()},300)})}
+function intro(tk){`],
+[`return tk===cdTok?countdown():0})`,`return tk===cdTok?waitStart(tk).then(function(){return tk===cdTok?countdown():0}):0})`],
+[`if(state=='warm')v=.8;`,`if(state=='warm')v=window.__wt?0:.8;`]
 ];
