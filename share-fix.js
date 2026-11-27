@@ -1,4 +1,5 @@
-/* v48: caption đổi sang LỜI CỦA KHÁCH chơi (ngôi "mình"), không còn là lời quảng cáo của 9 Sạch.
+/* v49: chia sẻ Facebook HOẶC nhập tên + SĐT (1 trong 2) đều hợp lệ để nhân viên trao quà. Bấm chia sẻ là ghi nhận quà ngay (claim share:1).
+   v48: caption đổi sang LỜI CỦA KHÁCH chơi (ngôi "mình"), không còn là lời quảng cáo của 9 Sạch.
    v47: ảnh ghép = cọp chạm đích + HÌNH QUÀ (thay bục 1-2-3); caption mới hào hứng (window.DCcap) và HIỂN THỊ trong hộp caption + nút Sao chép (iOS/Facebook bỏ qua text khi chia sẻ ảnh nên trước đây khách không thấy caption). Tên mới THÊM 1K - ĐUA NGAY NHẬN QUÀ.
    v46: KHÔNG gửi link nữa. Nút chia sẻ: (1) máy cho phép -> menu chia sẻ của máy kèm ảnh + caption; (2) khung nhúng (Google Sites) chặn menu chia sẻ -> mở share.html ở THẺ MỚI (không bị khung chặn), ảnh + caption được chuyển sang bằng postMessage, khách bấm nút ở đó để mở menu chia sẻ kèm ảnh; (3) popup bị chặn -> tải ảnh về + sao chép caption.
    v44: ảnh tải về tên duongduaquagiangsinh.jpg. v42: không còn đăng nhập Facebook. Dự phòng: nhập Họ tên + SĐT để nhân viên trao quà (claim như cũ). */
@@ -65,7 +66,7 @@ window.DCclaim=function(r,hd){
  mkCollage(r.ten).then(function(bl){blob=bl;view()});
  function view(){
   var u=blob?URL.createObjectURL(blob):'';
-  b.innerHTML="<div class='big'>🎉</div><h2>Chúc mừng bạn!</h2>"+(u?"<img src='"+u+"' alt='' style='width:100%;max-width:330px;border-radius:14px'>":"")+"<p>Cọp của bạn đã đội quà về đích</p><h1>"+esc(r.ten)+"</h1><p id='se' class='ge'></p>"+
+  b.innerHTML="<div class='big'>🎉</div><h2>Chúc mừng bạn!</h2>"+(u?"<img src='"+u+"' alt='' style='width:100%;max-width:330px;border-radius:14px'>":"")+"<p>Cọp của bạn đã đội quà về đích</p><h1>"+esc(r.ten)+"</h1><p id='se' class='ge'></p><p id='okm' style='font-weight:800;color:#0a7a2a'></p>"+
    "<button id='sb2' class='btn' type='button' style='background:#1877f2;color:#fff'>📣 CHIA SẺ LÊN FACEBOOK</button>"+
    "<div class='capbox'><div class='caph'>📝 Caption bài đăng (Facebook không tự điền)</div><textarea id='capt' readonly rows='6'></textarea><button id='cpb' class='btn capb' type='button'>📋 SAO CHÉP CAPTION</button><p class='caph2'>Trên Facebook: nhấn giữ ô viết bài → chọn <b>Dán</b> → Đăng.</p></div>"+
    "<button id='tg' class='btn' type='button' style='background:#fff;color:#7a0a1c;border:2px solid #d8132f'>🎁 Nhập tên &amp; SĐT để nhận quà</button>"+
@@ -92,8 +93,12 @@ window.DCclaim=function(r,hd){
   window.addEventListener('message',function(ev){if(ev.source===w&&ev.data&&ev.data.t==='dcshare-ready'){ready=true;send()}});
   var rd=new FileReader();rd.onload=function(){data=rd.result;send()};rd.readAsDataURL(blob);
   e.textContent='Đã mở trang chia sẻ ở thẻ mới: bấm nút CHIA SẺ LÊN FACEBOOK ở đó. Caption và hashtag đã sao chép sẵn.'}
+ var shared=false;
+ function mark(){var m=$('okm');if(m)m.textContent='✅ Đã ghi nhận quà! Đưa màn hình này cho nhân viên để nhận quà.';var t=$('tg');if(t)t.hidden=true;var f=$('fm');if(f)f.hidden=true}
  function doShare(){
   var e=$('se');copyText(cap);
+  /* chia sẻ = 1 trong 2 điều kiện hợp lệ: ghi nhận ngay để nhân viên trao quà (không chặn việc mở chia sẻ) */
+  if(!shared){shared=true;window.api('claim',{share:1,hd:hd,tok:r.tok}).then(mark).catch(function(x){if(x&&/đã nhập thông tin/.test(x.message)){mark();return}shared=false})}
   var f=null,can=false;
   try{if(blob)f=new File([blob],FILE,{type:'image/jpeg'})}catch(x){}
   try{can=!!(f&&navigator.share&&navigator.canShare&&navigator.canShare({files:[f]}))}catch(x){}
@@ -106,7 +111,7 @@ window.DCclaim=function(r,hd){
   if(ten.length<2){e.textContent='Vui lòng nhập họ tên';return}
   if(!/^0[0-9]{9}$/.test(sdt)){e.textContent='Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0)';return}
   e.textContent='';btn.disabled=true;btn.textContent='⏳ Đang gửi…';
-  function okk(){$('fm').innerHTML="<p style='font-weight:800'>✅ Đã ghi nhận quà! Đưa màn hình này cho nhân viên để nhận quà.</p>";$('tg').hidden=true}
+  function okk(){shared=true;mark()}
   window.api('claim',{ten:ten,sdt:sdt,hd:hd,tok:r.tok}).then(okk).catch(function(x){
    if(/đã nhập thông tin/.test(x.message)){okk();return}
    e.textContent=x.message;btn.disabled=false;btn.textContent='🎁 NHẬN QUÀ'})}
