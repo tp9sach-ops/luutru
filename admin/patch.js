@@ -55,12 +55,13 @@ function riskHtml(L){
  var by={};P.forEach(function(p){if(p.bat)(by[p.store]=by[p.store]||[]).push(p)});
  var rows=[],zero=[],low=[];
  Object.keys(by).forEach(function(s){
-  var live=by[s].filter(function(p){return p.tyle>0&&p.sl-(res[s+'|'+p.ten]||0)>0}),tot=live.reduce(function(a,p){return a+p.tyle},0);
+  var live=by[s].filter(function(p){return p.tyle>0&&p.sl-(res[s+'|'+p.ten]||0)>0&&!(typeof vipClosed=='function'&&vipClosed(p))}),tot=live.reduce(function(a,p){return a+p.tyle},0);
   if(!live.length)add('hi','🔴 '+s+': KHÔNG còn quà nào quay được → khách đua sẽ bị báo hết quà.');
   var n=L.filter(function(r){return r.ch===s}).length;
   by[s].forEach(function(p){
    var rv=res[s+'|'+p.ten]||0,av=p.sl-rv,why=[];
    if(p.tyle<=0)why.push('tỷ lệ cấu hình = 0');
+   var vc=typeof vipClosed=='function'?vipClosed(p):'';if(vc)why.push('quà VIP '+vc);
    if(p.sl<1)why.push('kho = 0 (đã hết)');
    else if(av<=0)why.push('kho còn '+p.sl+' nhưng '+rv+' phần đang giữ chỗ cho khách trúng chưa trao');
    var eff=(!why.length&&tot)?Math.round(p.tyle*1000/tot)/10:0,w=L.filter(function(r){return r.ch===s&&r.qua===p.ten}).length,ob=n?Math.round(w*1000/n)/10:0;
